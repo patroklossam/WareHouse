@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE hibernate-mapping PUBLIC "-//Hibernate/Hibernate Mapping DTD 3.0//EN" "http://www.hibernate.org/dtd/hibernate-mapping-3.0.dtd">
+<!-- Generated Aug 12, 2017 5:46:28 PM by Hibernate Tools 4.3.1 -->
+<hibernate-mapping>
+  <class name="com.storage.mywarehouse.View.WarehouseProduct" optimistic-lock="version" table="WarehouseProduct">
+    <id name="id" type="int">
+      <column name="Id"/>
+      <generator class="assigned"/>
+    </id>
+    <property name="productId" type="int">
+      <column name="ProductId"/>
+    </property>
+    <property name="brand" type="string">
+      <column length="2000000000" name="`Brand`" not-null="true"/>
+    </property>
+    <property name="type" type="string">
+      <column length="2000000000" name="Type" not-null="true"/>
+    </property>
+    <property name="quantity" type="int">
+      <column name="Quantity"/>
+    </property>
+    <property name="price" type="double">
+      <column name="Price" not-null="true" precision="2000000000" scale="10"/>
+    </property>
+    <property name="warehouse" type="string">
+      <column length="2000000000" name="Warehouse" not-null="true"/>
+    </property>
+  </class>
+</hibernate-mapping>

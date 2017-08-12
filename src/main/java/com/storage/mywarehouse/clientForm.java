@@ -227,6 +227,7 @@ public class clientForm extends javax.swing.JFrame {
         tx = session.beginTransaction();
         session.save(cust);
         tx.commit();
+        session.close();
 
         observable.changeData("refresh_clients");
         JOptionPane.showMessageDialog((Component) null, "New customer saved");

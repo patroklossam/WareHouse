@@ -7,6 +7,9 @@
 
 package com.storage.mywarehouse;
 
+import com.storage.mywarehouse.Entity.Warehouse;
+import com.storage.mywarehouse.Hibernate.NewHibernateUtil;
+import com.storage.mywarehouse.View.WarehouseProduct;
 import java.io.BufferedInputStream;
 import java.io.BufferedOutputStream;
 import java.io.DataInputStream;
@@ -15,6 +18,9 @@ import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.util.HashMap;
+import java.util.Iterator;
+import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.swing.JOptionPane;
@@ -23,6 +29,8 @@ import javax.swing.event.ChangeEvent;
 import javax.swing.table.DefaultTableModel;
 import org.apache.commons.collections.primitives.ArrayIntList;
 import org.apache.commons.collections.primitives.IntList;
+import org.hibernate.Session;
+import org.hibernate.Transaction;
 
 /**
  *
@@ -39,23 +47,34 @@ public class storagepanel extends javax.swing.JPanel {
     private boolean noprice;
     
     private DefaultTableModel tableModel;
+    private Warehouse warehouse;
     private String st_name;
+    private int st_id;
+    
+    private HashMap<Integer,Integer> DbToRow;
+    private List rows;
     private final MyObservable observable = new MyObservable();
     
     public void setName(String n){
         st_name = n;
     }
     
-    public storagepanel(String nam,mainframe frame) {
+    public Warehouse getWarehouse(){
+        return warehouse;
+    }
+    
+    public storagepanel(Warehouse wh ,mainframe frame) {
         
         
         //set observer
         observable.addObserver(frame);
         
-        st_name = nam;
+        st_id = wh.getWarehouseId();
+        st_name = wh.getName();
+        warehouse = wh;
         initComponents();
 
-        tableModel = new DefaultTableModel(new Object[]{"Μάρκα", "Τύπος", "Διάσταση", "Ποσότητα", "Τιμή"}, 0);
+        tableModel = new DefaultTableModel(new Object[]{"Code", "Brand", "Type", "Quantity", "Price"}, 0);
         jTable1.setModel(tableModel);
         
         jTable1.getDefaultEditor(String.class).addCellEditorListener(
@@ -107,6 +126,8 @@ public class storagepanel extends javax.swing.JPanel {
     }
 
     public boolean SaveStorage() {
+        
+        
         try {
             DataOutputStream out = new DataOutputStream(new BufferedOutputStream(new FileOutputStream("df_" + st_name + ".bdf")));
             out.writeInt(jTable1.getRowCount());  // to know the count of rows to read
@@ -119,15 +140,11 @@ public class storagepanel extends javax.swing.JPanel {
                 //System.out.print(jTable1.getColumnName(col));
             }
             
-            
-            
-            
             // write out all cells by row 
             // easy load by row
             for (int row = 0; row < jTable1.getRowCount(); row++) {
                 for (int col = 0; col < jTable1.getColumnCount(); col++) {
                     out.writeUTF(jTable1.getValueAt(row, col).toString());
-                    //System.out.print((String) jTable1.getValueAt(row, col));
                 }
             }
             out.close();
@@ -142,52 +159,29 @@ public class storagepanel extends javax.swing.JPanel {
         return false;
     }
 
-    public boolean Load() {
-        try {
-            DataInputStream in = new DataInputStream(new BufferedInputStream(new FileInputStream("df_" + st_name + ".bdf")));
+    public void Load() {
+        
+        DbToRow = new HashMap<>();
+        
+        Session session = NewHibernateUtil.getSessionFactory().openSession();
+        Transaction tx = session.beginTransaction();
+        
+        rows = session.createQuery("FROM Entry E where E.warehouseId = " + st_id).list();
+        
+        jTable1.setModel(tableModel);
+        int r = 0;
+        for (Iterator it = rows.iterator(); it.hasNext();) {
+            WarehouseProduct wp = (WarehouseProduct) it.next();
+            tableModel.addRow(new Object[]{wp.getProductId(), wp.getBrand(), wp.getType(), wp.getQuantity(), wp.getPrice()});
             
-            int rows = in.readInt();
-            int cols = in.readInt();
-            
-            
-            if (cols < tableModel.getColumnCount()){
-                noprice = true;
-            }
-            
-            Object[] obj;
-            if(noprice)
-                obj= new Object[tableModel.getColumnCount()];
-            else
-                obj= new Object[cols];
-            
-            int i;
-            for(i=0;i<cols;i++){
-                obj[i] = in.readUTF();
-            }
-            
-            
-            //tableModel = new DefaultTableModel(obj, 0);
-            jTable1.setModel(tableModel);
-            int j;
-            for (i =0;i<rows;i++){
-                for(j=0;j<cols;j++){
-                    obj[j] = in.readUTF();
-                }
-                if(noprice)
-                    obj[j]= 0.0;
-                tableModel.addRow(obj);
-            }
-            
-            in.close();
-            return true;
-        } catch (FileNotFoundException ex) {
-            JOptionPane.showMessageDialog(this, "Σφάλμα κατά το φόρτωμα της "+st_name+". Η αποθήκη θα ανοίξει χωρίς δεδομένα");
-                
-            return true;
-        } catch (IOException ex) {
-            Logger.getLogger(storagepanel.class.getName()).log(Level.SEVERE, null, ex);
-            return false;
+            DbToRow.put(r, wp.getId());
         }
+        
+        
+        
+        tx.commit();
+        session.close();
+        
     }
 
     /**

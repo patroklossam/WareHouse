@@ -41,7 +41,7 @@ public final class ClientFrame extends javax.swing.JFrame {
     private final MyObservable observable = new MyObservable();
     private List customers;
     
-    public ClientFrame(mainframe frame, final List<ImmutableTriple> customers) {
+    public ClientFrame(mainframe frame, final List customers) {
         
         observable.addObserver(frame);
         
@@ -82,33 +82,7 @@ public final class ClientFrame extends javax.swing.JFrame {
     
     public void save(){
         //decompose to triples
-        customers = new ArrayList<>();
-        String fname="";
-        String job="";
-        double dc = 0.0;
-        ImmutableTriple<String, String, Double> tpl;
-        for(int i=0;i<tbmodel.getRowCount();i++){
-            fname = tbmodel.getValueAt(i, 0)+ " " + tbmodel.getValueAt(i, 1);
-            job = "" + tbmodel.getValueAt(i, 2);
-            dc = Double.parseDouble(tbmodel.getValueAt(i, 3).toString());
-            tpl = new ImmutableTriple<>(fname,job, dc);
-            customers.add(tpl);
-        }
         
-        ObjectOutputStream oos = null;
-        try {
-            oos = new ObjectOutputStream(new BufferedOutputStream(new FileOutputStream("df_csr.bdf")));
-            oos.writeObject(customers);
-            oos.close();
-        } catch (IOException ex) {
-            Logger.getLogger(ClientFrame.class.getName()).log(Level.SEVERE, null, ex);
-        } finally {
-            try {
-                oos.close();
-            } catch (IOException ex) {
-                Logger.getLogger(ClientFrame.class.getName()).log(Level.SEVERE, null, ex);
-            }
-        }
             
     }
     
