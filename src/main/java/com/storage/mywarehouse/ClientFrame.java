@@ -5,6 +5,7 @@
  */
 package com.storage.mywarehouse;
 
+import com.storage.mywarehouse.Entity.Customer;
 import java.io.BufferedOutputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
@@ -12,6 +13,7 @@ import java.io.ObjectOutputStream;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
+import java.util.Iterator;
 import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -37,7 +39,7 @@ public final class ClientFrame extends javax.swing.JFrame {
     private DefaultTableModel tbmodel;
     
     private final MyObservable observable = new MyObservable();
-    private List<ImmutableTriple> customers;
+    private List customers;
     
     public ClientFrame(mainframe frame, final List<ImmutableTriple> customers) {
         
@@ -55,7 +57,7 @@ public final class ClientFrame extends javax.swing.JFrame {
         initComponents();
         
         
-        tbmodel = new DefaultTableModel(new Object[]{"ΕΠΩΝΥΜΟ","ΟΝΟΜΑ","ΕΠΑΓΓΕΛΜΑ","ΕΚΠΤΩΣΗ"},0);
+        tbmodel = new DefaultTableModel(new Object[]{"Last Name","First Name","Occupation","Discount"},0);
         jTable1.setModel(tbmodel);
         
         jTable1.getDefaultEditor(String.class).addCellEditorListener(
@@ -112,7 +114,7 @@ public final class ClientFrame extends javax.swing.JFrame {
     
     
     
-    public void refreshClients(List<ImmutableTriple> customers){
+    public void refreshClients(List customers){
         this.customers = customers;
         int rows = tbmodel.getRowCount();
         
@@ -121,10 +123,10 @@ public final class ClientFrame extends javax.swing.JFrame {
         //empty client table
         for(int i=0;i<rows;i++)
             tbmodel.removeRow(0);
-        for (ImmutableTriple customer : customers) {
-            ImmutableTriple<String, String, Double> trp = customer;
-            String fname = trp.getLeft();
-            tbmodel.addRow(new Object[]{fname.substring(0, fname.indexOf(' ')),fname.substring(fname.indexOf(' ')+1),trp.getMiddle(),trp.getRight()});
+        for (Iterator it = customers.iterator(); it.hasNext();) {
+            Customer customer = (Customer) it.next();
+            String fname = customer.getName();
+            tbmodel.addRow(new Object[]{customer.getLastName(),customer.getName(),customer.getOccupation(),customer.getDiscount()});
         }
         
     }
@@ -223,17 +225,17 @@ public final class ClientFrame extends javax.swing.JFrame {
     private javax.swing.JButton newClient;
     // End of variables declaration//GEN-END:variables
 
-    private static class ComparatorImpl implements Comparator<ImmutableTriple> {
+    private static class ComparatorImpl implements Comparator<Customer> {
 
         public ComparatorImpl() {
         }
 
         @Override
-        public int compare(ImmutableTriple o1, ImmutableTriple o2) {
+        public int compare(Customer o1, Customer o2) {
             
             // descending order (ascending order would be:
             // o1.getGrade()-o2.getGrade())
-            return ((String)o1.getLeft()).compareTo((String)o2.getLeft());
+            return (o1.getLastName() + " " +  o1.getLastName() ).compareTo(o2.getLastName() + " " +  o2.getLastName());
         }
     }
 }

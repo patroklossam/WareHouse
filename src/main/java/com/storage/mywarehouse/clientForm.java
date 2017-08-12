@@ -3,9 +3,10 @@
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
  */
-
 package com.storage.mywarehouse;
 
+import com.storage.mywarehouse.Entity.Customer;
+import com.storage.mywarehouse.Hibernate.NewHibernateUtil;
 import java.awt.Component;
 import java.io.BufferedInputStream;
 import java.io.BufferedOutputStream;
@@ -27,17 +28,21 @@ import javax.swing.JFrame;
 import javax.swing.JOptionPane;
 import org.apache.commons.lang3.tuple.ImmutableTriple;
 import org.apache.commons.lang3.tuple.Triple;
+import org.hibernate.Session;
+import org.hibernate.SessionFactory;
+import org.hibernate.Transaction;
 
 /**
  *
  * @author Patroklos
  */
-public class clientForm extends javax.swing.JFrame{
+public class clientForm extends javax.swing.JFrame {
 
-    
     private final MyObservable observable = new MyObservable();
+
     /**
      * Creates new form clientForm
+     *
      * @param frame for use in observer
      */
     public clientForm(mainframe frame) {
@@ -182,51 +187,53 @@ public class clientForm extends javax.swing.JFrame{
     }// </editor-fold>//GEN-END:initComponents
 
     private void jButton1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton1ActionPerformed
-        ObjectInputStream cus_in;
-        List<Triple> customers = new ArrayList<>();
-        try {
-            File file = new File("df_csr.bdf");
-            
-            if (file.exists()){
-                cus_in = new ObjectInputStream(new BufferedInputStream(new FileInputStream("df_csr.bdf")));
-                customers = (ArrayList<Triple>) cus_in.readObject();
-                cus_in.close();
-            }
-            
-            String full_name = "";
-            String full_job;
-            double full_dc;
-            if (clientSurname.getText().length()>0)
-                full_name+=clientSurname.getText()+ " ";
-            if (clientName.getText().length()>0)
-                full_name += clientName.getText();
-            if (clientJob.getText().length()>0)
-                full_job = clientJob.getText();
-            else
-                full_job = "";
-            if (discount.getText().length()>0)
-                full_dc = Double.parseDouble(discount.getText());
-            else
-                full_dc = 0.0;
 
+        Session session = NewHibernateUtil.getSessionFactory().openSession();
 
-            ImmutableTriple<String,String,Double> rtp = new ImmutableTriple<>(full_name,full_job,full_dc);
+        Transaction tx = session.beginTransaction();
 
-            customers.add(rtp);
+        List customerList = session.createQuery("FROM Customer c ORDER BY c.customerId DESC").list();
 
-            ObjectOutputStream oos = new ObjectOutputStream(new BufferedOutputStream(new FileOutputStream("df_csr.bdf")));
-            oos.writeObject(customers);
-            oos.close();
-            
-            observable.changeData("refresh_clients");
-            JOptionPane.showMessageDialog((Component)null, "Ο πελάτης καταχωρήθηκε επιτυχώς!!!");
-
-            Globals.ClientsFrame = false;
-            dispose();
-        
-        } catch (IOException | ClassNotFoundException ex) {
-            Logger.getLogger(clientForm.class.getName()).log(Level.SEVERE, null, ex);
+        int nextId = 0;
+        if (customerList.size() > 0) {
+            Customer cLast = (Customer) customerList.get(0);
+            nextId = cLast.getCustomerId() + 1;
         }
+        tx.commit();
+
+        String cName = "";
+        String cLastName = "";
+        String full_job;
+        double full_dc;
+        if (clientSurname.getText().length() > 0) {
+            cLastName += clientSurname.getText();
+        }
+        if (clientName.getText().length() > 0) {
+            cName += clientName.getText();
+        }
+        if (clientJob.getText().length() > 0) {
+            full_job = clientJob.getText();
+        } else {
+            full_job = "";
+        }
+        if (discount.getText().length() > 0) {
+            full_dc = Double.parseDouble(discount.getText());
+        } else {
+            full_dc = 0.0;
+        }
+
+        Customer cust = new Customer(nextId, cName, cLastName, full_job, full_dc);
+
+        tx = session.beginTransaction();
+        session.save(cust);
+        tx.commit();
+
+        observable.changeData("refresh_clients");
+        JOptionPane.showMessageDialog((Component) null, "New customer saved");
+
+        Globals.ClientsFrame = false;
+        dispose();
+
     }//GEN-LAST:event_jButton1ActionPerformed
 
     private void jButton2ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton2ActionPerformed
@@ -237,7 +244,6 @@ public class clientForm extends javax.swing.JFrame{
     /**
      * @param args the command line arguments
      */
-    
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JTextField clientJob;

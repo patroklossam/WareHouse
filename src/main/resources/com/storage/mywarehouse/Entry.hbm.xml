@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE hibernate-mapping PUBLIC "-//Hibernate/Hibernate Mapping DTD 3.0//EN" "http://www.hibernate.org/dtd/hibernate-mapping-3.0.dtd">
+<!-- Generated Aug 12, 2017 5:46:28 PM by Hibernate Tools 4.3.1 -->
+<hibernate-mapping>
+  <class name="com.storage.mywarehouse.Entity.Entry" optimistic-lock="version" table="Entry">
+    <id name="entryId" type="int">
+      <column name="EntryId"/>
+      <generator class="assigned"/>
+    </id>
+    <property name="warehouseId" type="int">
+      <column name="WarehouseId" not-null="true"/>
+    </property>
+    <property name="productId" type="int">
+      <column name="ProductId" not-null="true"/>
+    </property>
+    <property name="quantity" type="int">
+      <column name="Quantity" not-null="true"/>
+    </property>
+  </class>
+</hibernate-mapping>

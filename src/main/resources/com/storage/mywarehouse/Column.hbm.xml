@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE hibernate-mapping PUBLIC "-//Hibernate/Hibernate Mapping DTD 3.0//EN" "http://www.hibernate.org/dtd/hibernate-mapping-3.0.dtd">
+<!-- Generated Aug 12, 2017 5:46:28 PM by Hibernate Tools 4.3.1 -->
+<hibernate-mapping>
+  <class name="com.storage.mywarehouse.Entity.Column" optimistic-lock="version" table="Column">
+    <id name="columnId" type="int">
+      <column name="ColumnId"/>
+      <generator class="assigned"/>
+    </id>
+    <property name="name" type="string">
+      <column length="2000000000" name="Name" not-null="true"/>
+    </property>
+  </class>
+</hibernate-mapping>

@@ -184,13 +184,13 @@
                   <Properties>
                     <Property name="model" type="javax.swing.table.TableModel" editor="org.netbeans.modules.form.editors2.TableModelEditor">
                       <Table columnCount="7" rowCount="4">
-                        <Column editable="false" title="&#x39c;&#x3ac;&#x3c1;&#x3ba;&#x3b1;" type="java.lang.String"/>
-                        <Column editable="false" title="&#x3a4;&#x3cd;&#x3c0;&#x3bf;&#x3c2;" type="java.lang.String"/>
-                        <Column editable="false" title="&#x394;&#x3b9;&#x3ac;&#x3c3;&#x3c4;&#x3b1;&#x3c3;&#x3b7;" type="java.lang.String"/>
-                        <Column editable="false" title="&#x3a3;&#x3cd;&#x3bd;&#x3bf;&#x3bb;&#x3bf;" type="java.lang.Integer"/>
-                        <Column editable="false" title="&#x391;&#x3c0;&#x3bf;&#x3b8;&#x3ae;&#x3ba;&#x3b5;&#x3c2;" type="java.lang.String"/>
-                        <Column editable="false" title="&#x3a4;&#x3b9;&#x3bc;&#x3ae;" type="java.lang.Double"/>
-                        <Column editable="false" title="&#x3a4;&#x3b9;&#x3bc;&#x3ae; &#x3a0;&#x3b5;&#x3bb;&#x3ac;&#x3c4;&#x3b7;" type="java.lang.Double"/>
+                        <Column editable="false" title="Code" type="java.lang.String"/>
+                        <Column editable="false" title="Brand" type="java.lang.String"/>
+                        <Column editable="false" title="Type" type="java.lang.String"/>
+                        <Column editable="false" title="Total Amount" type="java.lang.Integer"/>
+                        <Column editable="false" title="Warehouses" type="java.lang.String"/>
+                        <Column editable="false" title="Price" type="java.lang.Double"/>
+                        <Column editable="false" title="Price after Discount" type="java.lang.Double"/>
                       </Table>
                     </Property>
                     <Property name="columnModel" type="javax.swing.table.TableColumnModel" editor="org.netbeans.modules.form.editors2.TableColumnModelEditor">
@@ -246,12 +246,12 @@
             </Component>
             <Component class="javax.swing.JLabel" name="jLabel2">
               <Properties>
-                <Property name="text" type="java.lang.String" value="&#x395;&#x3b9;&#x3c3;&#x3ac;&#x3b3;&#x3b5;&#x3c4;&#x3b5; &#x394;&#x3b9;&#x3ac;&#x3c3;&#x3c4;&#x3b1;&#x3c3;&#x3b7;"/>
+                <Property name="text" type="java.lang.String" value="Enter code:"/>
               </Properties>
             </Component>
             <Component class="javax.swing.JButton" name="jButton2">
               <Properties>
-                <Property name="text" type="java.lang.String" value="&#x391;&#x3bd;&#x3b1;&#x3b6;&#x3ae;&#x3c4;&#x3b7;&#x3c3;&#x3b7;"/>
+                <Property name="text" type="java.lang.String" value="Search"/>
               </Properties>
               <Events>
                 <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="jButton2ActionPerformed"/>
@@ -259,7 +259,7 @@
             </Component>
             <Component class="javax.swing.JLabel" name="jLabel1">
               <Properties>
-                <Property name="text" type="java.lang.String" value="&#x395;&#x3c0;&#x3b9;&#x3bb;&#x3ad;&#x3be;&#x3c4;&#x3b5; &#x3a0;&#x3b5;&#x3bb;&#x3ac;&#x3c4;&#x3b7;"/>
+                <Property name="text" type="java.lang.String" value="Select Customer"/>
               </Properties>
             </Component>
             <Component class="javax.swing.JComboBox" name="clientCombo">
@@ -274,7 +274,7 @@
             </Component>
             <Component class="javax.swing.JLabel" name="jLabel3">
               <Properties>
-                <Property name="text" type="java.lang.String" value="&#x3a0;&#x3bf;&#x3c3;&#x3bf;&#x3c3;&#x3c4;&#x3cc; &#x388;&#x3ba;&#x3c0;&#x3c4;&#x3c9;&#x3c3;&#x3b7;&#x3c2;"/>
+                <Property name="text" type="java.lang.String" value="Discount Percentage"/>
               </Properties>
             </Component>
             <Component class="javax.swing.JLabel" name="jLabel5">
@@ -331,9 +331,9 @@
                   <Properties>
                     <Property name="model" type="javax.swing.table.TableModel" editor="org.netbeans.modules.form.editors2.TableModelEditor">
                       <Table columnCount="5" rowCount="4">
+                        <Column editable="false" title="Code" type="java.lang.String"/>
                         <Column editable="false" title="Brand" type="java.lang.String"/>
                         <Column editable="false" title="Type" type="java.lang.String"/>
-                        <Column editable="false" title="Description" type="java.lang.String"/>
                         <Column editable="false" title="Total Quantity" type="java.lang.Integer"/>
                         <Column editable="false" title="WareHouses" type="java.lang.String"/>
                       </Table>

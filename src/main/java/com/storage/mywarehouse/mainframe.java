@@ -4,10 +4,10 @@
  *
  * Copyright ownership: Patroklos Samaras
  */
-
-
 package com.storage.mywarehouse;
 
+import com.storage.mywarehouse.Entity.Customer;
+import com.storage.mywarehouse.Hibernate.NewHibernateUtil;
 import java.awt.Component;
 import java.awt.Dimension;
 import java.awt.Rectangle;
@@ -54,31 +54,30 @@ import org.apache.commons.lang3.tuple.ImmutablePair;
 import org.apache.commons.lang3.tuple.ImmutableTriple;
 import org.apache.commons.lang3.tuple.Pair;
 import org.apache.commons.lang3.tuple.Triple;
-
+import org.hibernate.Session;
+import org.hibernate.Transaction;
 
 /**
  *
  * @author Patroklos
  */
-
-public final class mainframe extends javax.swing.JFrame implements Observer{
+public final class mainframe extends javax.swing.JFrame implements Observer {
 
     /**
      * Creates new form mainframe
      */
-    
     private ClientFrame clframe;
     private DataInputStream idx;
     private ObjectInputStream cus_in;
-    private List<ImmutableTriple> customers;
+    private List customers;
     private DoubleList customer_dc;
     private List<storagepanel> panels;
     private DefaultTableModel tableModel;
     private DefaultTableModel tableModel_rep;
-    private TreeMap<MyTriple<String,String,String>, MyTriple<Integer,String,Double>> tires;
-    
+    private TreeMap<MyTriple<String, String, String>, MyTriple<Integer, String, Double>> products;
+
     @Override // Observer interface's implemented method
-    public void update(Observable o, Object data) {	
+    public void update(Observable o, Object data) {
         switch ((String) data) {
             case "refresh":
                 refreshIndex();
@@ -89,43 +88,38 @@ public final class mainframe extends javax.swing.JFrame implements Observer{
                 break;
         }
     }
-    
-    public void refreshCustomers(){
+
+    public void refreshCustomers() {
         customers = new ArrayList<>();
-        
+
         customer_dc = new ArrayDoubleList();
         customer_dc.add(0.0);
-        clientCombo.addItem("Επιλέξτε Πελάτη");
-        
-        try {
-            cus_in = new ObjectInputStream(new BufferedInputStream(new FileInputStream("df_csr.bdf")));
-            
-            customers = (ArrayList<ImmutableTriple>) cus_in.readObject();
-            cus_in.close();
-            
-            if(Globals.ClientsFrame)
-                clframe.refreshClients(customers);
-            
-            clientCombo.removeAllItems();
-            customer_dc = new ArrayDoubleList();
-            customer_dc.add(0.0);
-            clientCombo.addItem("Επιλέξτε Πελάτη");
-            
-            ImmutableTriple<String,String,Double> csmr;
-            for (Iterator<ImmutableTriple> it = customers.iterator(); it.hasNext();) {
-                csmr = it.next();
-                customer_dc.add(Double.parseDouble(csmr.getRight().toString()));
-                clientCombo.addItem(csmr.getLeft()+" - "+csmr.getMiddle());
-            }
-             
-            
-            
-        } catch (IOException | ClassNotFoundException ex) {
-            // nothing to do -- customer list is empty
+        clientCombo.addItem("Select Customer");
+
+        Session session = NewHibernateUtil.getSessionFactory().openSession();
+
+        Transaction tx = session.beginTransaction();
+
+        customers = session.createQuery("FROM Customer").list();
+
+        if (Globals.ClientsFrame) {
+            clframe.refreshClients(customers);
         }
+
+        clientCombo.removeAllItems();
+        customer_dc = new ArrayDoubleList();
+        customer_dc.add(0.0);
+        clientCombo.addItem("Customer Selection");
+
+        for (Iterator it = customers.iterator(); it.hasNext();) {
+            Customer cust = (Customer) it.next();
+            customer_dc.add(cust.getDiscount());
+            clientCombo.addItem(cust.getLastName() + " - " + cust.getName());
+        }
+
     }
-    
-    public void saveCustomers(){
+
+    public void saveCustomers() {
         ObjectOutputStream oos = null;
         try {
             oos = new ObjectOutputStream(new BufferedOutputStream(new FileOutputStream("df_csr.bdf")));
@@ -141,7 +135,7 @@ public final class mainframe extends javax.swing.JFrame implements Observer{
             }
         }
     }
-    
+
     public mainframe() {
         addWindowListener(new java.awt.event.WindowAdapter() {
             @Override
@@ -149,31 +143,24 @@ public final class mainframe extends javax.swing.JFrame implements Observer{
                 save();
             }
         });
-        
-        
-        
-        
-        
+
         panels = new ArrayList<>();
-        tires = new TreeMap<>();
+        products = new TreeMap<>();
         customer_dc = new ArrayDoubleList();
         customer_dc.add(0.0);
         initComponents();
-        
-        
-        
+
         setTitle("StoreHouse");
-        
+
         //
-        tableModel = new DefaultTableModel(new Object[]{"Μάρκα", "Τύπος", "Διάσταση", "Σύνολο", "Αποθήκες","Τιμή","Τιμή_πελάτη"}, 0);
+        tableModel = new DefaultTableModel(new Object[]{"Code", "Brand", "Type", "Total Amount", "Warehouse", "Price", "Price after Discount"}, 0);
         jTable1.setModel(tableModel);
-        tableModel_rep = new DefaultTableModel(new Object[]{"Μάρκα", "Τύπος", "Διάσταση", "Σύνολο", "Αποθήκες"}, 0);
+        tableModel_rep = new DefaultTableModel(new Object[]{"Code", "Brand", "Type", "Quantity", "Warehouse"}, 0);
         reporter.setModel(tableModel_rep);
-        
+
         jTable1.setAutoResizeMode(JTable.AUTO_RESIZE_OFF);
         jTable1.setRowSelectionAllowed(true);
-        
-        
+
         jTable1.getColumnModel().getColumn(0).setMinWidth(150);
         jTable1.getColumnModel().getColumn(0).setPreferredWidth(150);
         jTable1.getColumnModel().getColumn(0).setMaxWidth(150);
@@ -192,12 +179,10 @@ public final class mainframe extends javax.swing.JFrame implements Observer{
         jTable1.getColumnModel().getColumn(6).setMinWidth(150);
         jTable1.getColumnModel().getColumn(6).setPreferredWidth(150);
         jTable1.getColumnModel().getColumn(6).setMaxWidth(150);
-        
-        
+
         reporter.setAutoResizeMode(JTable.AUTO_RESIZE_OFF);
         reporter.setRowSelectionAllowed(true);
-        
-        
+
         reporter.getColumnModel().getColumn(0).setMinWidth(150);
         reporter.getColumnModel().getColumn(0).setPreferredWidth(150);
         reporter.getColumnModel().getColumn(0).setMaxWidth(150);
@@ -210,21 +195,17 @@ public final class mainframe extends javax.swing.JFrame implements Observer{
         reporter.getColumnModel().getColumn(4).setMinWidth(300);
         reporter.getColumnModel().getColumn(4).setPreferredWidth(300);
         reporter.getColumnModel().getColumn(4).setMaxWidth(300);
-        
-        
-        TabTitleEditListener l = new TabTitleEditListener(tab,panels,this);
+
+        TabTitleEditListener l = new TabTitleEditListener(tab, panels, this);
         tab.addChangeListener(l);
         tab.addMouseListener(l);
-                
-    
-               
-        
+
         try {
             idx = new DataInputStream(new BufferedInputStream(new FileInputStream("df0000.idx")));
         } catch (FileNotFoundException ex) {
             try {
 
-                JOptionPane.showMessageDialog(this, "Δεν βρέθηκαν ρυθμίσεις οπότε πραγματοποιείται επαναφορά στην αρχική κατάσταση");
+                JOptionPane.showMessageDialog(this, "No previous configuration found. The program will initiate in a clean state.");
                 DataOutputStream out = new DataOutputStream(new BufferedOutputStream(new FileOutputStream("df0000.idx")));
 
                 out.writeInt(0);
@@ -239,86 +220,78 @@ public final class mainframe extends javax.swing.JFrame implements Observer{
                 Logger.getLogger(mainframe.class.getName()).log(Level.SEVERE, null, ex1);
             }
         }
-        
+
         try {
             int num_of_tabs = idx.readInt();
 
-            for(int i=0;i<num_of_tabs;i++){
+            for (int i = 0; i < num_of_tabs; i++) {
                 String nam = idx.readUTF();
-                panels.add(new storagepanel(nam,this));
+                panels.add(new storagepanel(nam, this));
                 panels.get(i).Load();
-                
+
                 tab.add(nam, panels.get(i));
-                
+
                 //System.out.println("added");
             }
 
-            
             idx.close();
 
         } catch (IOException ex1) {
             Logger.getLogger(mainframe.class.getName()).log(Level.SEVERE, null, ex1);
         }
-        
+
         cleanEmptyUntitledTabs();
-        
-        
+
         refreshIndex();
         fillInReporter();
-        
-        
+
         //load customers
         refreshCustomers();
-        
-        
+
         setLocationRelativeTo(null);
     }
-    
-    private void cleanEmptyUntitledTabs(){
-        
-        for(int i=0; i<panels.size();i++){
-            if(tab.getTitleAt(i+2).length() < 2){
-                if(panels.get(i).getTableModel().getRowCount() == 0){
-                    tab.remove(i+2);
+
+    private void cleanEmptyUntitledTabs() {
+
+        for (int i = 0; i < panels.size(); i++) {
+            if (tab.getTitleAt(i + 2).length() < 2) {
+                if (panels.get(i).getTableModel().getRowCount() == 0) {
+                    tab.remove(i + 2);
                     panels.remove(i--);
                 }
-            }       
+            }
         }
-        
+
         CleanIndexSave();
     }
-    
-    
-    
-    public void refreshIndex(){
-        tires = new TreeMap<>();
-        for(int i=0; i<panels.size();i++){
-            int rows =  panels.get(i).getTableModel().getRowCount();
+
+    public void refreshIndex() {
+        products = new TreeMap<>();
+        for (int i = 0; i < panels.size(); i++) {
+            int rows = panels.get(i).getTableModel().getRowCount();
             String[] temp;
-            
+
             int q;
-            for(int j=0;j<rows;j++){
+            for (int j = 0; j < rows; j++) {
                 temp = new String[3];
-                q =0;
-                
+                q = 0;
+
                 temp[0] = (String) panels.get(i).getTableModel().getValueAt(j, 0);
                 temp[1] = (String) panels.get(i).getTableModel().getValueAt(j, 1);
                 temp[2] = (String) panels.get(i).getTableModel().getValueAt(j, 2);
-                
-                MyTriple<String,String,String> tpl = new MyTriple<>(temp[0],temp[1],temp[2]);
+
+                MyTriple<String, String, String> tpl = new MyTriple<>(temp[0], temp[1], temp[2]);
                 q = Integer.parseInt((String) panels.get(i).getTableModel().getValueAt(j, 3));
-                
+
                 // me apothikes
-                if(tires.containsKey(tpl)){
-                    MyTriple<Integer, String, Double> tp= new MyTriple<>(tires.get(tpl).getLeft()+q,tires.get(tpl).getMiddle()+", "+tab.getTitleAt(i+2),Double.parseDouble(panels.get(i).getTableModel().getValueAt(j, 4).toString()));
-                    tires.put(tpl, tp);
+                if (products.containsKey(tpl)) {
+                    MyTriple<Integer, String, Double> tp = new MyTriple<>(products.get(tpl).getLeft() + q, products.get(tpl).getMiddle() + ", " + tab.getTitleAt(i + 2), Double.parseDouble(panels.get(i).getTableModel().getValueAt(j, 4).toString()));
+                    products.put(tpl, tp);
+                } else {
+                    MyTriple<Integer, String, Double> tp = new MyTriple<>(q, tab.getTitleAt(i + 2), Double.parseDouble(panels.get(i).getTableModel().getValueAt(j, 4).toString()));
+                    products.put(tpl, tp);
                 }
-                else{
-                    MyTriple<Integer, String, Double> tp= new MyTriple<>(q,tab.getTitleAt(i+2),Double.parseDouble( panels.get(i).getTableModel().getValueAt(j, 4).toString()));
-                    tires.put(tpl, tp);
-                }
-                
-                
+
                 // xwris apothikes
                 /*if(tires.containsKey(tpl)){
                     tires.put(tpl, tires.get(tpl) + q);
@@ -326,75 +299,66 @@ public final class mainframe extends javax.swing.JFrame implements Observer{
                 else
                     tires.put(tpl, q);*/
             }
-            
+
         }
         //int rows = tableModel.getRowCount();
-        
-        
+
         // empty table;
         /*for(int i=0;i<rows;i++){
             //System.out.println("removed row: "+i);
             tableModel.removeRow(0);
         }*/
         //tableModel.fireTableDataChanged();
-        
         // fill table with All tires 
         /*for(MyTriple<String,String,String> tripl : tires.keySet())
             tableModel.addRow(new Object[]{tripl.getLeft(),tripl.getMiddle(),tripl.getRight(),tires.get(tripl).getLeft(),tires.get(tripl).getRight()});
-        */
-        
-        
+         */
     }
-    
-    public void fillInReporter(){
-        
+
+    public void fillInReporter() {
+
         //clean reporter
-        
         int rows = tableModel_rep.getRowCount();
-        for(int i=0;i<rows;i++){
+        for (int i = 0; i < rows; i++) {
             tableModel_rep.removeRow(0);
         }
-        
+
         //fill table with ZERO quantities
-        
-        for(MyTriple<String,String,String> tripl : tires.keySet()){
-                if(tires.get(tripl).getLeft() == 0)
-                    tableModel_rep.addRow(new Object[]{tripl.getLeft(),tripl.getMiddle(),tripl.getRight(),tires.get(tripl).getLeft(),tires.get(tripl).getMiddle()});
+        for (MyTriple<String, String, String> tripl : products.keySet()) {
+            if (products.get(tripl).getLeft() == 0) {
+                tableModel_rep.addRow(new Object[]{tripl.getLeft(), tripl.getMiddle(), tripl.getRight(), products.get(tripl).getLeft(), products.get(tripl).getMiddle()});
             }
-        
+        }
+
     }
-    
-    
-    public boolean save(){
+
+    public boolean save() {
         refreshIndex();
-        
-        if(panels.size()>1)
-            for(int i=1; i<panels.size();i++){
+
+        if (panels.size() > 1) {
+            for (int i = 1; i < panels.size(); i++) {
                 panels.get(i).SaveStorage();
             }
+        }
         return true;
     }
-    
-    private void CleanIndexSave(){
-        try{
-                DataOutputStream out = new DataOutputStream(new BufferedOutputStream(new FileOutputStream("df0000.idx")));
 
+    private void CleanIndexSave() {
+        try {
+            DataOutputStream out = new DataOutputStream(new BufferedOutputStream(new FileOutputStream("df0000.idx")));
 
-                out.writeInt(panels.size());
-                for(int i=0;i<panels.size();i++)
-                    out.writeUTF(tab.getTitleAt(i+2));
+            out.writeInt(panels.size());
+            for (int i = 0; i < panels.size(); i++) {
+                out.writeUTF(tab.getTitleAt(i + 2));
+            }
 
-                out.close();
-            } catch (FileNotFoundException ex1) {
-                Logger.getLogger(mainframe.class.getName()).log(Level.SEVERE, null, ex1);
-            } catch (IOException ex1) {
-                Logger.getLogger(mainframe.class.getName()).log(Level.SEVERE, null, ex1);
-            } 
+            out.close();
+        } catch (FileNotFoundException ex1) {
+            Logger.getLogger(mainframe.class.getName()).log(Level.SEVERE, null, ex1);
+        } catch (IOException ex1) {
+            Logger.getLogger(mainframe.class.getName()).log(Level.SEVERE, null, ex1);
+        }
     }
-    
-    
-    
-    
 
     /**
      * This method is called from within the constructor to initialize the form.
@@ -438,7 +402,7 @@ public final class mainframe extends javax.swing.JFrame implements Observer{
                 {null, null, null, null, null, null, null}
             },
             new String [] {
-                "Μάρκα", "Τύπος", "Διάσταση", "Σύνολο", "Αποθήκες", "Τιμή", "Τιμή Πελάτη"
+                "Code", "Brand", "Type", "Total Amount", "Warehouses", "Price", "Price after Discount"
             }
         ) {
             Class[] types = new Class [] {
@@ -488,16 +452,16 @@ public final class mainframe extends javax.swing.JFrame implements Observer{
             }
         });
 
-        jLabel2.setText("Εισάγετε Διάσταση");
+        jLabel2.setText("Enter code:");
 
-        jButton2.setText("Αναζήτηση");
+        jButton2.setText("Search");
         jButton2.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 jButton2ActionPerformed(evt);
             }
         });
 
-        jLabel1.setText("Επιλέξτε Πελάτη");
+        jLabel1.setText("Select Customer");
 
         clientCombo.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
@@ -505,7 +469,7 @@ public final class mainframe extends javax.swing.JFrame implements Observer{
             }
         });
 
-        jLabel3.setText("Ποσοστό Έκπτωσης");
+        jLabel3.setText("Discount Percentage");
 
         jLabel5.setText("%");
 
@@ -578,7 +542,7 @@ public final class mainframe extends javax.swing.JFrame implements Observer{
                 {null, null, null, null, null}
             },
             new String [] {
-                "Brand", "Type", "Description", "Total Quantity", "WareHouses"
+                "Code", "Brand", "Type", "Total Quantity", "WareHouses"
             }
         ) {
             Class[] types = new Class [] {
@@ -694,54 +658,51 @@ public final class mainframe extends javax.swing.JFrame implements Observer{
     }//GEN-LAST:event_closeActionPerformed
 
     private void jMenuItem1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jMenuItem1ActionPerformed
-        String name = JOptionPane.showInputDialog(this, "Δώστε ένα όνομα για την αποθήκη: (πχ Πατάρι1)");
-        
-        if(name != null ){
-            panels.add(new storagepanel(name,this));
-            tab.add(name, panels.get(panels.size()-1));
+        String name = JOptionPane.showInputDialog(this, "Enter name for the nenw warehouse");
+
+        if (name != null) {
+            panels.add(new storagepanel(name, this));
+            tab.add(name, panels.get(panels.size() - 1));
 
             CleanIndexSave();
-        }  
-        
+        }
+
     }//GEN-LAST:event_jMenuItem1ActionPerformed
 
     private void searchfieldActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_searchfieldActionPerformed
     }//GEN-LAST:event_searchfieldActionPerformed
 
     private void jButton2ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton2ActionPerformed
-        
-        
-        if(searchfield.getText().length() > 2){
-            
+
+        if (searchfield.getText().length() > 2) {
+
             //first we clean the whole generic table
-            
             int rows = tableModel.getRowCount();
-            for(int i=0;i<rows;i++){
-            //System.out.println("removed row: "+i);
+            for (int i = 0; i < rows; i++) {
+                //System.out.println("removed row: "+i);
                 tableModel.removeRow(0);
             }
-            
-            //get the desired dimension
-            String dimension = searchfield.getText();
-            
-            // fill the table with rows that contain this dimension ONLY
-            for(MyTriple<String,String,String> tripl : tires.keySet()){
-                if(tripl.getRight().contains(dimension)){
-                    double init_pr = tires.get(tripl).getRight();
-                    double dc  = Double.parseDouble(dc_label.getText());
+
+            //get the desired code
+            String search_code = searchfield.getText();
+
+            // fill the table with rows that contain this code ONLY
+            for (MyTriple<String, String, String> tripl : products.keySet()) {
+                if (tripl.getLeft().contains(search_code)) {
+                    double init_pr = products.get(tripl).getRight();
+                    double dc = Double.parseDouble(dc_label.getText());
                     double dc_pr = init_pr * dc / 100;
-                    
-                    tableModel.addRow(new Object[]{tripl.getLeft(),tripl.getMiddle(),tripl.getRight(),tires.get(tripl).getLeft(),tires.get(tripl).getMiddle(),init_pr,init_pr - dc_pr});
-            
+
+                    tableModel.addRow(new Object[]{tripl.getLeft(), tripl.getMiddle(), tripl.getRight(), products.get(tripl).getLeft(), products.get(tripl).getMiddle(), init_pr, init_pr - dc_pr});
                 }
             }
-            
+
         }
     }//GEN-LAST:event_jButton2ActionPerformed
 
     private void jMenuItem3ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jMenuItem3ActionPerformed
-        if(!Globals.ClientsFrame){
-            clframe = new ClientFrame(this,customers);
+        if (!Globals.ClientsFrame) {
+            clframe = new ClientFrame(this, customers);
             Globals.ClientsFrame = true;
         }
     }//GEN-LAST:event_jMenuItem3ActionPerformed
@@ -749,32 +710,32 @@ public final class mainframe extends javax.swing.JFrame implements Observer{
     private void clientComboActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_clientComboActionPerformed
         if (evt.getActionCommand().equalsIgnoreCase("comboBoxChanged")) {
             int index = clientCombo.getSelectedIndex();
-            if(index>=0)
-                dc_label.setText(customer_dc.get(index)+"");
-            else
+            if (index >= 0) {
+                dc_label.setText(customer_dc.get(index) + "");
+            } else {
                 dc_label.setText("");
-            
-            
-            for(int i=0;i<tableModel.getRowCount();i++){
-                if(tableModel.getValueAt(i, 5).toString().length()>0){
+            }
+
+            for (int i = 0; i < tableModel.getRowCount(); i++) {
+                if (tableModel.getValueAt(i, 5).toString().length() > 0) {
                     double initial_v = (double) tableModel.getValueAt(i, 5);
                     double dc = Double.parseDouble(dc_label.getText());
-                    tableModel.setValueAt(initial_v - (initial_v*dc/100) , i, 6);
+                    tableModel.setValueAt(initial_v - (initial_v * dc / 100), i, 6);
                 }
             }
         }
     }//GEN-LAST:event_clientComboActionPerformed
-    
+
     /**
      * @param args the command line arguments
      */
 //    public static void main(String args[]) {
-        /* Set the Nimbus look and feel */
-        //<editor-fold defaultstate="collapsed" desc=" Look and feel setting code (optional) ">
-        /* If Nimbus (introduced in Java SE 6) is not available, stay with the default look and feel.
+    /* Set the Nimbus look and feel */
+    //<editor-fold defaultstate="collapsed" desc=" Look and feel setting code (optional) ">
+    /* If Nimbus (introduced in Java SE 6) is not available, stay with the default look and feel.
          * For details see http://download.oracle.com/javase/tutorial/uiswing/lookandfeel/plaf.html 
-         */
-       /* try {
+     */
+ /* try {
 
             UIManager.setLookAndFeel(
                     UIManager.getSystemLookAndFeelClassName());
@@ -788,10 +749,10 @@ public final class mainframe extends javax.swing.JFrame implements Observer{
         } catch (javax.swing.UnsupportedLookAndFeelException ex) {
             java.util.logging.Logger.getLogger(mainframe.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
         }*/
-        //</editor-fold>
+    //</editor-fold>
 
-        /* Create and display the form */
-  /*      java.awt.EventQueue.invokeLater(new Runnable() {
+    /* Create and display the form */
+ /*      java.awt.EventQueue.invokeLater(new Runnable() {
             public void run() {
                 new mainframe().setVisible(true);
             }
@@ -824,28 +785,34 @@ public final class mainframe extends javax.swing.JFrame implements Observer{
     // End of variables declaration//GEN-END:variables
 }
 
+class MyTriple<L, M, R> extends Triple<L, M, R> {
 
-class MyTriple<L,M,R> extends Triple<L,M,R>{
-    
     private static final long serialVersionUID = 1L;
-    
-    /** Left object */
+
+    /**
+     * Left object
+     */
     public final L left;
-    /** Middle object */
+    /**
+     * Middle object
+     */
     public final M middle;
-    /** Right object */
+    /**
+     * Right object
+     */
     public final R right;
-    
+
     public static <L, M, R> MyTriple<L, M, R> of(final L left, final M middle, final R right) {
         return new MyTriple<L, M, R>(left, middle, right);
     }
-    
+
     public MyTriple(L left, M middle, R right) {
         super();
         this.left = left;
         this.middle = middle;
         this.right = right;
     }
+
     public L getLeft() {
         return left;
     }
@@ -865,18 +832,18 @@ class MyTriple<L,M,R> extends Triple<L,M,R>{
     public R getRight() {
         return right;
     }
-    
+
     @Override
     public int compareTo(final Triple<L, M, R> other) {
-      return new CompareToBuilder().append(getRight(), other.getRight())
-              .append(getMiddle(), other.getMiddle())
-              .append(getLeft(), other.getLeft()).toComparison();
+        return new CompareToBuilder().append(getRight(), other.getRight())
+                .append(getMiddle(), other.getMiddle())
+                .append(getLeft(), other.getLeft()).toComparison();
     }
-    
+
 }
 
-
 class TabTitleEditListener extends MouseAdapter implements ChangeListener {
+
     private final JTextField editor = new JTextField();
     private final JTabbedPane tabbedPane;
     private int editing_idx = -1;
@@ -887,53 +854,59 @@ class TabTitleEditListener extends MouseAdapter implements ChangeListener {
     private final MyObservable observable = new MyObservable();
 
     public TabTitleEditListener(final JTabbedPane tabbedPane, List<storagepanel> pan, mainframe frame) {
-        
-        
+
         super();
-        
-        
+
         //set observer
         observable.addObserver(frame);
-        
+
         this.tabbedPane = tabbedPane;
         this.panels = pan;
         editor.setBorder(BorderFactory.createEmptyBorder());
         editor.addFocusListener(new FocusAdapter() {
-            @Override public void focusLost(FocusEvent e) {
+            @Override
+            public void focusLost(FocusEvent e) {
                 renameTabTitle();
             }
         });
         editor.addKeyListener(new KeyAdapter() {
-            @Override public void keyPressed(KeyEvent e) {
-                if(e.getKeyCode()==KeyEvent.VK_ENTER) {
+            @Override
+            public void keyPressed(KeyEvent e) {
+                if (e.getKeyCode() == KeyEvent.VK_ENTER) {
                     renameTabTitle();
-                }else if(e.getKeyCode()==KeyEvent.VK_ESCAPE) {
+                } else if (e.getKeyCode() == KeyEvent.VK_ESCAPE) {
                     cancelEditing();
-                }else{
-                    editor.setPreferredSize(editor.getText().length()>len ? null : dim);
+                } else {
+                    editor.setPreferredSize(editor.getText().length() > len ? null : dim);
                     tabbedPane.revalidate();
                 }
             }
         });
         tabbedPane.getInputMap(JComponent.WHEN_FOCUSED).put(
-            KeyStroke.getKeyStroke(KeyEvent.VK_ENTER, 0), "start-editing");
+                KeyStroke.getKeyStroke(KeyEvent.VK_ENTER, 0), "start-editing");
         tabbedPane.getActionMap().put("start-editing", new AbstractAction() {
-            @Override public void actionPerformed(ActionEvent e) {
+            @Override
+            public void actionPerformed(ActionEvent e) {
                 startEditing();
             }
         });
     }
-    @Override public void stateChanged(ChangeEvent e) {
+
+    @Override
+    public void stateChanged(ChangeEvent e) {
         renameTabTitle();
     }
-    @Override public void mouseClicked(MouseEvent me) {
+
+    @Override
+    public void mouseClicked(MouseEvent me) {
         Rectangle rect = tabbedPane.getUI().getTabBounds(tabbedPane, tabbedPane.getSelectedIndex());
-        if(rect!=null && rect.contains(me.getPoint()) && me.getClickCount()==2) {
+        if (rect != null && rect.contains(me.getPoint()) && me.getClickCount() == 2) {
             startEditing();
-        }else{
+        } else {
             renameTabTitle();
         }
     }
+
     private void startEditing() {
         editing_idx = tabbedPane.getSelectedIndex();
         tabComponent = tabbedPane.getTabComponentAt(editing_idx);
@@ -946,8 +919,9 @@ class TabTitleEditListener extends MouseAdapter implements ChangeListener {
         dim = editor.getPreferredSize();
         editor.setMinimumSize(dim);
     }
+
     private void cancelEditing() {
-        if(editing_idx>=0) {
+        if (editing_idx >= 0) {
             tabbedPane.setTabComponentAt(editing_idx, tabComponent);
             editor.setVisible(false);
             editing_idx = -1;
@@ -957,27 +931,28 @@ class TabTitleEditListener extends MouseAdapter implements ChangeListener {
             tabbedPane.requestFocusInWindow();
         }
     }
+
     private void renameTabTitle() {
         String title = editor.getText().trim();
-        if(editing_idx>=0 && !title.isEmpty()) {
+        if (editing_idx >= 0 && !title.isEmpty()) {
             tabbedPane.setTitleAt(editing_idx, title);
-            panels.get(editing_idx-2).setName(title);
-            panels.get(editing_idx-2).SaveStorage();
-            
-            try{
+            panels.get(editing_idx - 2).setName(title);
+            panels.get(editing_idx - 2).SaveStorage();
+
+            try {
                 DataOutputStream out = new DataOutputStream(new BufferedOutputStream(new FileOutputStream("df0000.idx")));
 
-
                 out.writeInt(panels.size());
-                for(int i=0;i<panels.size();i++)
-                    out.writeUTF(tabbedPane.getTitleAt(i+2));
+                for (int i = 0; i < panels.size(); i++) {
+                    out.writeUTF(tabbedPane.getTitleAt(i + 2));
+                }
 
                 out.close();
             } catch (FileNotFoundException ex1) {
                 Logger.getLogger(mainframe.class.getName()).log(Level.SEVERE, null, ex1);
             } catch (IOException ex1) {
                 Logger.getLogger(mainframe.class.getName()).log(Level.SEVERE, null, ex1);
-            } 
+            }
         }
         cancelEditing();
         observable.changeData("refresh");

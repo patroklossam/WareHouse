@@ -126,7 +126,7 @@ public class storagepanel extends javax.swing.JPanel {
             // easy load by row
             for (int row = 0; row < jTable1.getRowCount(); row++) {
                 for (int col = 0; col < jTable1.getColumnCount(); col++) {
-                    out.writeUTF((String) jTable1.getValueAt(row, col));
+                    out.writeUTF(jTable1.getValueAt(row, col).toString());
                     //System.out.print((String) jTable1.getValueAt(row, col));
                 }
             }
@@ -216,7 +216,7 @@ public class storagepanel extends javax.swing.JPanel {
                 {null, null, null, null, null}
             },
             new String [] {
-                "Brand", "Type", "Description", "Quantity", "Price"
+                "Code", "Brand", "Type", "Quantity", "Price"
             }
         ) {
             Class[] types = new Class [] {

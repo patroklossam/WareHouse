@@ -169,7 +169,7 @@ public class home extends javax.swing.JFrame {
 
                 String ps = in.readUTF();
                 in.close();
-                if(ps.equals(securePassword)){
+                if(!ps.equals(securePassword)){
                     okCxl = JOptionPane.showConfirmDialog(this, pfn, "Enter your new Password", JOptionPane.OK_CANCEL_OPTION);
                     if (okCxl == JOptionPane.OK_OPTION){
                         okCxl = JOptionPane.showConfirmDialog(this, pfnn, "Re-Enter your new Password", JOptionPane.OK_CANCEL_OPTION);
