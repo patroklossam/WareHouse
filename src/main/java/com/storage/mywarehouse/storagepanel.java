@@ -7,14 +7,12 @@
 
 package com.storage.mywarehouse;
 
+import com.storage.mywarehouse.Entity.Entry;
 import com.storage.mywarehouse.Entity.Warehouse;
 import com.storage.mywarehouse.Hibernate.NewHibernateUtil;
 import com.storage.mywarehouse.View.WarehouseProduct;
-import java.io.BufferedInputStream;
 import java.io.BufferedOutputStream;
-import java.io.DataInputStream;
 import java.io.DataOutputStream;
-import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
@@ -85,8 +83,9 @@ public class storagepanel extends javax.swing.JPanel {
 
                     public void editingStopped(ChangeEvent e) {
                         System.out.println("editingStopped: apply additional action");
-                        SaveStorage();
+                        int rowId = jTable1.getSelectedRow();
                         
+                        SaveEntry(rowId);
                         observable.changeData("refresh");
                     }
                 });
@@ -125,38 +124,18 @@ public class storagepanel extends javax.swing.JPanel {
         return tableModel;
     }
 
-    public boolean SaveStorage() {
+    public void SaveEntry(int rowId) {
         
+        Entry e = (Entry) rows.get(rowId);
         
-        try {
-            DataOutputStream out = new DataOutputStream(new BufferedOutputStream(new FileOutputStream("df_" + st_name + ".bdf")));
-            out.writeInt(jTable1.getRowCount());  // to know the count of rows to read
-            out.writeInt(jTable1.getColumnCount()); // for the count of columns
-            
-            
-            // write out column names
-            for (int col = 0; col < jTable1.getColumnCount(); col++) {
-                 out.writeUTF(jTable1.getColumnName(col));
-                //System.out.print(jTable1.getColumnName(col));
-            }
-            
-            // write out all cells by row 
-            // easy load by row
-            for (int row = 0; row < jTable1.getRowCount(); row++) {
-                for (int col = 0; col < jTable1.getColumnCount(); col++) {
-                    out.writeUTF(jTable1.getValueAt(row, col).toString());
-                }
-            }
-            out.close();
-            return true;
-        } catch (FileNotFoundException ex) {
-            Logger.getLogger(storagepanel.class.getName()).log(Level.SEVERE, null, ex);
-        } catch (IOException ex) {
-            Logger.getLogger(storagepanel.class.getName()).log(Level.SEVERE, null, ex);
-            return false;
-        }
-
-        return false;
+        e.setQuantity(Integer.parseInt(jTable1.getValueAt(rowId, 3).toString()));
+        
+        Session session = NewHibernateUtil.getSessionFactory().openSession();
+        Transaction tx = session.beginTransaction();
+        
+        session.update(e);
+        tx.commit();
+        session.close();
     }
 
     public void Load() {
@@ -283,8 +262,10 @@ public class storagepanel extends javax.swing.JPanel {
     }//GEN-LAST:event_jButton1ActionPerformed
 
     private void jTable1KeyTyped(java.awt.event.KeyEvent evt) {//GEN-FIRST:event_jTable1KeyTyped
-        if(evt.getKeyCode() == java.awt.event.KeyEvent.VK_ENTER)
-            SaveStorage();
+        if(evt.getKeyCode() == java.awt.event.KeyEvent.VK_ENTER){
+            int rid = jTable1.getSelectedRow();
+            SaveEntry(rid);
+        }
     }//GEN-LAST:event_jTable1KeyTyped
 
     private void formKeyTyped(java.awt.event.KeyEvent evt) {//GEN-FIRST:event_formKeyTyped
@@ -294,19 +275,26 @@ public class storagepanel extends javax.swing.JPanel {
 
     private void jButton3ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton3ActionPerformed
         cleanEmptyRows();
-        SaveStorage();
     }//GEN-LAST:event_jButton3ActionPerformed
 
     private void jButton4ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton4ActionPerformed
         int row = jTable1.getSelectedRow();
         if(row !=-1){
-            int sel = JOptionPane.showConfirmDialog(this, "Θέλετε σίγουρα να διαγράψετε αυτή τη γραμμή;", "Επιβεβαίωση", JOptionPane.OK_CANCEL_OPTION);
+            int sel = JOptionPane.showConfirmDialog(this, "Are you sure you want to delete this entry?", "Confirm", JOptionPane.OK_CANCEL_OPTION);
             if (sel == 0)
                 tableModel.removeRow(row);
-
-            SaveStorage();
+            
+            Entry e = (Entry) rows.get(row);
+            rows.remove(e);
+            
+            Session session = NewHibernateUtil.getSessionFactory().openSession();
+            Transaction tx = session.beginTransaction();
+            
+            session.delete(e);
+            tx.commit();
+            session.close();
         }else{
-            JOptionPane.showMessageDialog(this, "Πρέπει πρώτα να πιλέξετε με κλικ την γραμμή που θέλετε να διαγράψετε!");
+            JOptionPane.showMessageDialog(this, "First click on the row you want to delete.");
         }
     }//GEN-LAST:event_jButton4ActionPerformed
 

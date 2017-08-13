@@ -146,12 +146,12 @@ public final class mainframe extends javax.swing.JFrame implements Observer {
     }
 
     public mainframe() {
-        addWindowListener(new java.awt.event.WindowAdapter() {
-            @Override
-            public void windowClosing(java.awt.event.WindowEvent windowEvent) {
-                save();
-            }
-        });
+//        addWindowListener(new java.awt.event.WindowAdapter() {
+//            @Override
+//            public void windowClosing(java.awt.event.WindowEvent windowEvent) {
+//                
+//            }
+//        });
 
         panels = new ArrayList<>();
         warehouseList = new ArrayList<>();
@@ -314,16 +314,7 @@ public final class mainframe extends javax.swing.JFrame implements Observer {
 
     }
 
-    public boolean save() {
-        refreshIndex();
-
-        if (panels.size() > 1) {
-            for (int i = 1; i < panels.size(); i++) {
-                panels.get(i).SaveStorage();
-            }
-        }
-        return true;
-    }
+    
 
     private Warehouse AddNewWareHouse(String name) {
         
@@ -651,7 +642,6 @@ public final class mainframe extends javax.swing.JFrame implements Observer {
     }// </editor-fold>//GEN-END:initComponents
 
     private void closeActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_closeActionPerformed
-        save();
         dispose();
         System.exit(0);
     }//GEN-LAST:event_closeActionPerformed
@@ -943,25 +933,20 @@ class TabTitleEditListener extends MouseAdapter implements ChangeListener {
 
     private void renameTabTitle() {
         String title = editor.getText().trim();
+        
         if (editing_idx >= 0 && !title.isEmpty()) {
             tabbedPane.setTitleAt(editing_idx, title);
+            
             panels.get(editing_idx - 2).setName(title);
-            panels.get(editing_idx - 2).SaveStorage();
-
-            try {
-                DataOutputStream out = new DataOutputStream(new BufferedOutputStream(new FileOutputStream("df0000.idx")));
-
-                out.writeInt(panels.size());
-                for (int i = 0; i < panels.size(); i++) {
-                    out.writeUTF(tabbedPane.getTitleAt(i + 2));
-                }
-
-                out.close();
-            } catch (FileNotFoundException ex1) {
-                Logger.getLogger(mainframe.class.getName()).log(Level.SEVERE, null, ex1);
-            } catch (IOException ex1) {
-                Logger.getLogger(mainframe.class.getName()).log(Level.SEVERE, null, ex1);
-            }
+            Warehouse wh = panels.get(editing_idx - 2).getWarehouse();
+            wh.setName(title);
+            
+            Session session = NewHibernateUtil.getSessionFactory().openSession();
+            Transaction tx = session.beginTransaction();
+            session.update(wh);
+            tx.commit();
+            session.close();
+            
         }
         cancelEditing();
         observable.changeData("refresh");

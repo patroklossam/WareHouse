@@ -8,28 +8,9 @@ package com.storage.mywarehouse;
 import com.storage.mywarehouse.Entity.Customer;
 import com.storage.mywarehouse.Hibernate.NewHibernateUtil;
 import java.awt.Component;
-import java.io.BufferedInputStream;
-import java.io.BufferedOutputStream;
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileOutputStream;
-import java.io.IOException;
-import java.io.ObjectInputStream;
-import java.io.ObjectOutput;
-import java.io.ObjectOutputStream;
-import java.sql.SQLException;
-import java.sql.Statement;
-import java.util.ArrayList;
 import java.util.List;
-import java.util.Observable;
-import java.util.logging.Level;
-import java.util.logging.Logger;
-import javax.swing.JFrame;
 import javax.swing.JOptionPane;
-import org.apache.commons.lang3.tuple.ImmutableTriple;
-import org.apache.commons.lang3.tuple.Triple;
 import org.hibernate.Session;
-import org.hibernate.SessionFactory;
 import org.hibernate.Transaction;
 
 /**
@@ -46,8 +27,16 @@ public class clientForm extends javax.swing.JFrame {
      * @param frame for use in observer
      */
     public clientForm(mainframe frame) {
+        
         observable.addObserver(frame);
         Globals.ClientsFrame = true;
+         addWindowListener(new java.awt.event.WindowAdapter() {
+            @Override
+            public void windowClosing(java.awt.event.WindowEvent windowEvent) {
+                dispose();
+            }
+        });
+        
         initComponents();
     }
 

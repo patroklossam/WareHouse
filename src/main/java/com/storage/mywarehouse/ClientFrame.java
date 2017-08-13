@@ -6,23 +6,13 @@
 package com.storage.mywarehouse;
 
 import com.storage.mywarehouse.Entity.Customer;
-import java.io.BufferedOutputStream;
-import java.io.FileOutputStream;
-import java.io.IOException;
-import java.io.ObjectOutputStream;
-import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.Iterator;
 import java.util.List;
-import java.util.logging.Level;
-import java.util.logging.Logger;
-import javax.management.ImmutableDescriptor;
 import javax.swing.event.CellEditorListener;
 import javax.swing.event.ChangeEvent;
 import javax.swing.table.DefaultTableModel;
-import javax.swing.table.TableColumn;
-import org.apache.commons.lang3.tuple.ImmutableTriple;
 
 /**
  *
