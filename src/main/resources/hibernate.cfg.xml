@@ -43,7 +43,7 @@ Contributor(s):
   <session-factory>
     <property name="hibernate.connection.driver_class">org.sqlite.JDBC</property>
     <property name="dialect">com.enigmabridge.hibernate.dialect.SQLiteDialect</property>
-    <property name="hibernate.connection.url">jdbc:sqlite:C:\Users\C5247463\Desktop\git\Warehouse\db\storage.db</property>
+    <property name="hibernate.connection.url">jdbc:sqlite:db/storage.db</property>
     <mapping resource="com/storage/mywarehouse/Entry.hbm.xml"/>
     <mapping resource="com/storage/mywarehouse/Product.hbm.xml"/>
     <mapping resource="com/storage/mywarehouse/Column.hbm.xml"/>
