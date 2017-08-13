@@ -35,6 +35,8 @@ public final class ClientFrame extends javax.swing.JFrame {
         
         observable.addObserver(frame);
         
+        setResizable(false);
+        
         this.customers = customers;
         addWindowListener(new java.awt.event.WindowAdapter() {
             @Override
@@ -110,6 +112,9 @@ public final class ClientFrame extends javax.swing.JFrame {
         jTable1 = new javax.swing.JTable();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
+
+        jPanel1.setMaximumSize(new java.awt.Dimension(508, 353));
+        jPanel1.setMinimumSize(new java.awt.Dimension(508, 353));
 
         newClient.setText("New Customer");
         newClient.addActionListener(new java.awt.event.ActionListener() {

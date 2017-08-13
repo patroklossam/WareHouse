@@ -30,7 +30,9 @@ public class clientForm extends javax.swing.JFrame {
         
         observable.addObserver(frame);
         Globals.ClientsFrame = true;
-         addWindowListener(new java.awt.event.WindowAdapter() {
+        
+        setResizable(false);
+        addWindowListener(new java.awt.event.WindowAdapter() {
             @Override
             public void windowClosing(java.awt.event.WindowEvent windowEvent) {
                 dispose();
