@@ -4,23 +4,16 @@
  *
  * Copyright ownership: Patroklos Samaras
  */
-
 package com.storage.mywarehouse;
 
 import com.storage.mywarehouse.Entity.Entry;
 import com.storage.mywarehouse.Entity.Warehouse;
 import com.storage.mywarehouse.Hibernate.NewHibernateUtil;
 import com.storage.mywarehouse.View.WarehouseProduct;
-import java.io.BufferedOutputStream;
-import java.io.DataOutputStream;
-import java.io.FileNotFoundException;
-import java.io.FileOutputStream;
-import java.io.IOException;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 import javax.swing.JOptionPane;
 import javax.swing.event.CellEditorListener;
 import javax.swing.event.ChangeEvent;
@@ -39,34 +32,32 @@ public class storagepanel extends javax.swing.JPanel {
     /**
      * Creates new form storagepanel
      */
-    
-    
     //flag to check older version files
     private boolean noprice;
-    
+
     private DefaultTableModel tableModel;
     private Warehouse warehouse;
     private String st_name;
     private int st_id;
-    
-    private HashMap<Integer,Integer> DbToRow;
+
+    private HashMap<Integer, Integer> DbToRow;
     private List rows;
     private final MyObservable observable = new MyObservable();
-    
-    public void setName(String n){
+
+    public void setName(String n) {
         st_name = n;
     }
-    
-    public Warehouse getWarehouse(){
+
+    public Warehouse getWarehouse() {
         return warehouse;
     }
-    
-    public storagepanel(Warehouse wh ,mainframe frame) {
-        
-        
+
+    public storagepanel(Warehouse wh, mainframe frame) {
+
         //set observer
         observable.addObserver(frame);
-        
+
+        rows = new ArrayList<>();
         st_id = wh.getWarehouseId();
         st_name = wh.getName();
         warehouse = wh;
@@ -74,93 +65,97 @@ public class storagepanel extends javax.swing.JPanel {
 
         tableModel = new DefaultTableModel(new Object[]{"Code", "Brand", "Type", "Quantity", "Price"}, 0);
         jTable1.setModel(tableModel);
-        
+
         jTable1.getDefaultEditor(String.class).addCellEditorListener(
                 new CellEditorListener() {
-                    public void editingCanceled(ChangeEvent e) {
-                        System.out.println("editingCanceled");
-                    }
+            public void editingCanceled(ChangeEvent e) {
+                System.out.println("editingCanceled");
+            }
 
-                    public void editingStopped(ChangeEvent e) {
-                        System.out.println("editingStopped: apply additional action");
-                        int rowId = jTable1.getSelectedRow();
-                        
-                        SaveEntry(rowId);
-                        observable.changeData("refresh");
-                    }
-                });
+            public void editingStopped(ChangeEvent e) {
+                System.out.println("editingStopped: apply additional action");
+                int rowId = jTable1.getSelectedRow();
+
+                SaveEntry(rowId);
+                observable.changeData("refresh");
+            }
+        });
 
     }
-    
-    private void cleanEmptyRows(){
+
+    private void cleanEmptyRows() {
         IntList ids = new ArrayIntList();
         int rows = tableModel.getRowCount();
         int cols = tableModel.getColumnCount();
-        
-        int sum =0;
-        
+
+        int sum = 0;
+
         //get empty lines
-        for(int i=0;i<rows;i++){
-            sum=0;
-            for(int j=0;j<cols;j++)
-                if(tableModel.getValueAt(i, j).equals("") || tableModel.getValueAt(i, j).equals(" "))
+        for (int i = 0; i < rows; i++) {
+            sum = 0;
+            for (int j = 0; j < cols; j++) {
+                if (tableModel.getValueAt(i, j).equals("") || tableModel.getValueAt(i, j).equals(" ")) {
                     sum++;
-            
-            if(sum == cols)
+                }
+            }
+
+            if (sum == cols) {
                 ids.add(i);
+            }
         }
-        
+
         // list to array to get elements reversed
-        
         int rev[] = ids.toArray();
-        
-        
+
         // remove rows reversly
-        for(int i=rev.length-1;i>=0;i--)
+        for (int i = rev.length - 1; i >= 0; i--) {
             tableModel.removeRow(rev[i]);
+        }
     }
-    
-    public DefaultTableModel getTableModel(){
+
+    public DefaultTableModel getTableModel() {
         return tableModel;
     }
 
     public void SaveEntry(int rowId) {
-        
-        Entry e = (Entry) rows.get(rowId);
-        
-        e.setQuantity(Integer.parseInt(jTable1.getValueAt(rowId, 3).toString()));
-        
-        Session session = NewHibernateUtil.getSessionFactory().openSession();
-        Transaction tx = session.beginTransaction();
-        
-        session.update(e);
-        tx.commit();
-        session.close();
+
+        if (rowId != -1) {
+            Entry e = (Entry) rows.get(rowId);
+
+            if (e != null) {
+
+                Session session = NewHibernateUtil.getSessionFactory().openSession();
+                Transaction tx = session.beginTransaction();
+                e.setQuantity(Integer.parseInt(jTable1.getValueAt(rowId, 3).toString()));
+                session.update(e);
+
+                tx.commit();
+                session.close();
+            }
+        }
     }
 
     public void Load() {
-        
+
         DbToRow = new HashMap<>();
-        
+
         Session session = NewHibernateUtil.getSessionFactory().openSession();
         Transaction tx = session.beginTransaction();
-        
+
         rows = session.createQuery("FROM Entry E where E.warehouseId = " + st_id).list();
-        
+
         jTable1.setModel(tableModel);
         int r = 0;
         for (Iterator it = rows.iterator(); it.hasNext();) {
             WarehouseProduct wp = (WarehouseProduct) it.next();
             tableModel.addRow(new Object[]{wp.getProductId(), wp.getBrand(), wp.getType(), wp.getQuantity(), wp.getPrice()});
-            
+
             DbToRow.put(r, wp.getId());
         }
-        
-        
-        
+
         tx.commit();
         session.close();
-        
+
     }
 
     /**
@@ -195,9 +190,16 @@ public class storagepanel extends javax.swing.JPanel {
             Class[] types = new Class [] {
                 java.lang.String.class, java.lang.String.class, java.lang.String.class, java.lang.Integer.class, java.lang.Double.class
             };
+            boolean[] canEdit = new boolean [] {
+                false, false, false, true, true
+            };
 
             public Class getColumnClass(int columnIndex) {
                 return types [columnIndex];
+            }
+
+            public boolean isCellEditable(int rowIndex, int columnIndex) {
+                return canEdit [columnIndex];
             }
         });
         jTable1.getTableHeader().setReorderingAllowed(false);
@@ -262,7 +264,7 @@ public class storagepanel extends javax.swing.JPanel {
     }//GEN-LAST:event_jButton1ActionPerformed
 
     private void jTable1KeyTyped(java.awt.event.KeyEvent evt) {//GEN-FIRST:event_jTable1KeyTyped
-        if(evt.getKeyCode() == java.awt.event.KeyEvent.VK_ENTER){
+        if (evt.getKeyCode() == java.awt.event.KeyEvent.VK_ENTER) {
             int rid = jTable1.getSelectedRow();
             SaveEntry(rid);
         }
@@ -279,21 +281,22 @@ public class storagepanel extends javax.swing.JPanel {
 
     private void jButton4ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton4ActionPerformed
         int row = jTable1.getSelectedRow();
-        if(row !=-1){
+        if (row != -1) {
             int sel = JOptionPane.showConfirmDialog(this, "Are you sure you want to delete this entry?", "Confirm", JOptionPane.OK_CANCEL_OPTION);
-            if (sel == 0)
+            if (sel == 0) {
                 tableModel.removeRow(row);
-            
+            }
+
             Entry e = (Entry) rows.get(row);
             rows.remove(e);
-            
+
             Session session = NewHibernateUtil.getSessionFactory().openSession();
             Transaction tx = session.beginTransaction();
-            
+
             session.delete(e);
             tx.commit();
             session.close();
-        }else{
+        } else {
             JOptionPane.showMessageDialog(this, "First click on the row you want to delete.");
         }
     }//GEN-LAST:event_jButton4ActionPerformed

@@ -7,7 +7,6 @@
 package com.storage.mywarehouse;
 
 import com.storage.mywarehouse.Entity.Customer;
-import com.storage.mywarehouse.Entity.Product;
 import com.storage.mywarehouse.Entity.Warehouse;
 import com.storage.mywarehouse.Hibernate.NewHibernateUtil;
 import com.storage.mywarehouse.View.WarehouseProduct;
@@ -21,16 +20,6 @@ import java.awt.event.KeyAdapter;
 import java.awt.event.KeyEvent;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
-import java.io.BufferedInputStream;
-import java.io.BufferedOutputStream;
-import java.io.DataInputStream;
-import java.io.DataOutputStream;
-import java.io.FileInputStream;
-import java.io.FileNotFoundException;
-import java.io.FileOutputStream;
-import java.io.IOException;
-import java.io.ObjectInputStream;
-import java.io.ObjectOutputStream;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
@@ -53,10 +42,6 @@ import javax.swing.table.DefaultTableModel;
 import org.apache.commons.collections.primitives.ArrayDoubleList;
 import org.apache.commons.collections.primitives.DoubleList;
 import org.apache.commons.lang3.builder.CompareToBuilder;
-import org.apache.commons.lang3.tuple.ImmutablePair;
-import org.apache.commons.lang3.tuple.ImmutableTriple;
-import org.apache.commons.lang3.tuple.Pair;
-import org.apache.commons.lang3.tuple.Triple;
 import org.hibernate.Session;
 import org.hibernate.Transaction;
 
@@ -70,15 +55,12 @@ public final class mainframe extends javax.swing.JFrame implements Observer {
      * Creates new form mainframe
      */
     private ClientFrame clframe;
-    private DataInputStream idx;
-    private ObjectInputStream cus_in;
     private List customers;
     private DoubleList customer_dc;
     private List<storagepanel> panels;
     private List<Warehouse> warehouseList;
     private DefaultTableModel tableModel;
     private DefaultTableModel tableModel_rep;
-    private TreeMap<MyTriple<String, String, String>, MyTriple<Integer, String, Double>> products;
     private List productList;
     private List reporterProductList;
 
@@ -86,7 +68,6 @@ public final class mainframe extends javax.swing.JFrame implements Observer {
     public void update(Observable o, Object data) {
         switch ((String) data) {
             case "refresh":
-                refreshIndex();
                 fillInReporter();
                 break;
             case "refresh_clients":
@@ -128,22 +109,6 @@ public final class mainframe extends javax.swing.JFrame implements Observer {
 
     }
 
-    public void saveCustomers() {
-        ObjectOutputStream oos = null;
-        try {
-            oos = new ObjectOutputStream(new BufferedOutputStream(new FileOutputStream("df_csr.bdf")));
-            oos.writeObject(customers);
-            oos.close();
-        } catch (IOException ex) {
-            Logger.getLogger(ClientFrame.class.getName()).log(Level.SEVERE, null, ex);
-        } finally {
-            try {
-                oos.close();
-            } catch (IOException ex) {
-                Logger.getLogger(ClientFrame.class.getName()).log(Level.SEVERE, null, ex);
-            }
-        }
-    }
 
     public mainframe() {
 //        addWindowListener(new java.awt.event.WindowAdapter() {
@@ -155,7 +120,6 @@ public final class mainframe extends javax.swing.JFrame implements Observer {
 
         panels = new ArrayList<>();
         warehouseList = new ArrayList<>();
-        products = new TreeMap<>();
         customer_dc = new ArrayDoubleList();
         customer_dc.add(0.0);
         initComponents();
@@ -233,7 +197,6 @@ public final class mainframe extends javax.swing.JFrame implements Observer {
         session.close();
         
         
-        refreshIndex();
         fillInReporter();
 
         //load customers
@@ -254,37 +217,36 @@ public final class mainframe extends javax.swing.JFrame implements Observer {
         }
     }
 
-    public void refreshIndex() {
-        products = new TreeMap<>();
-        for (int i = 0; i < panels.size(); i++) {
-            int rows = panels.get(i).getTableModel().getRowCount();
-            String[] temp;
-
-            int q;
-            for (int j = 0; j < rows; j++) {
-                temp = new String[3];
-                q = 0;
-
-                temp[0] = (String) panels.get(i).getTableModel().getValueAt(j, 0);
-                temp[1] = (String) panels.get(i).getTableModel().getValueAt(j, 1);
-                temp[2] = (String) panels.get(i).getTableModel().getValueAt(j, 2);
-
-                MyTriple<String, String, String> tpl = new MyTriple<>(temp[0], temp[1], temp[2]);
-                q = Integer.parseInt((String) panels.get(i).getTableModel().getValueAt(j, 3));
-
-                // me apothikes
-                if (products.containsKey(tpl)) {
-                    MyTriple<Integer, String, Double> tp = new MyTriple<>(products.get(tpl).getLeft() + q, products.get(tpl).getMiddle() + ", " + tab.getTitleAt(i + 2), Double.parseDouble(panels.get(i).getTableModel().getValueAt(j, 4).toString()));
-                    products.put(tpl, tp);
-                } else {
-                    MyTriple<Integer, String, Double> tp = new MyTriple<>(q, tab.getTitleAt(i + 2), Double.parseDouble(panels.get(i).getTableModel().getValueAt(j, 4).toString()));
-                    products.put(tpl, tp);
-                }
-            }
-
-        }
-        
-    }
+//    public void refreshIndex() {
+//        for (int i = 0; i < panels.size(); i++) {
+//            int rows = panels.get(i).getTableModel().getRowCount();
+//            String[] temp;
+//
+//            int q;
+//            for (int j = 0; j < rows; j++) {
+//                temp = new String[3];
+//                q = 0;
+//
+//                temp[0] = (String) panels.get(i).getTableModel().getValueAt(j, 0);
+//                temp[1] = (String) panels.get(i).getTableModel().getValueAt(j, 1);
+//                temp[2] = (String) panels.get(i).getTableModel().getValueAt(j, 2);
+//
+//                MyTriple<String, String, String> tpl = new MyTriple<>(temp[0], temp[1], temp[2]);
+//                q = Integer.parseInt((String) panels.get(i).getTableModel().getValueAt(j, 3));
+//
+//                // me apothikes
+//                if (products.containsKey(tpl)) {
+//                    MyTriple<Integer, String, Double> tp = new MyTriple<>(products.get(tpl).getLeft() + q, products.get(tpl).getMiddle() + ", " + tab.getTitleAt(i + 2), Double.parseDouble(panels.get(i).getTableModel().getValueAt(j, 4).toString()));
+//                    products.put(tpl, tp);
+//                } else {
+//                    MyTriple<Integer, String, Double> tp = new MyTriple<>(q, tab.getTitleAt(i + 2), Double.parseDouble(panels.get(i).getTableModel().getValueAt(j, 4).toString()));
+//                    products.put(tpl, tp);
+//                }
+//            }
+//
+//        }
+//        
+//    }
 
     public void fillInReporter() {
 
@@ -784,62 +746,6 @@ public final class mainframe extends javax.swing.JFrame implements Observer {
     // End of variables declaration//GEN-END:variables
 }
 
-class MyTriple<L, M, R> extends Triple<L, M, R> {
-
-    private static final long serialVersionUID = 1L;
-
-    /**
-     * Left object
-     */
-    public final L left;
-    /**
-     * Middle object
-     */
-    public final M middle;
-    /**
-     * Right object
-     */
-    public final R right;
-
-    public static <L, M, R> MyTriple<L, M, R> of(final L left, final M middle, final R right) {
-        return new MyTriple<L, M, R>(left, middle, right);
-    }
-
-    public MyTriple(L left, M middle, R right) {
-        super();
-        this.left = left;
-        this.middle = middle;
-        this.right = right;
-    }
-
-    public L getLeft() {
-        return left;
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public M getMiddle() {
-        return middle;
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public R getRight() {
-        return right;
-    }
-
-    @Override
-    public int compareTo(final Triple<L, M, R> other) {
-        return new CompareToBuilder().append(getRight(), other.getRight())
-                .append(getMiddle(), other.getMiddle())
-                .append(getLeft(), other.getLeft()).toComparison();
-    }
-
-}
 
 class TabTitleEditListener extends MouseAdapter implements ChangeListener {
 
