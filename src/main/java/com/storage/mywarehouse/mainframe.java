@@ -50,6 +50,8 @@ public final class mainframe extends javax.swing.JFrame implements Observer {
     /**
      * Creates new form mainframe
      */
+    
+    private ProductForm prframe;
     private ClientFrame clframe;
     private List customers;
     private DoubleList customer_dc;
@@ -327,6 +329,7 @@ public final class mainframe extends javax.swing.JFrame implements Observer {
         jMenu2 = new javax.swing.JMenu();
         jMenu4 = new javax.swing.JMenu();
         jMenu6 = new javax.swing.JMenu();
+        jMenuItem4 = new javax.swing.JMenuItem();
         jMenu3 = new javax.swing.JMenu();
         jMenuItem3 = new javax.swing.JMenuItem();
         jMenu5 = new javax.swing.JMenu();
@@ -558,6 +561,15 @@ public final class mainframe extends javax.swing.JFrame implements Observer {
         jMenu4.setText("Management");
 
         jMenu6.setText("Product");
+
+        jMenuItem4.setText("Add Product");
+        jMenuItem4.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jMenuItem4ActionPerformed(evt);
+            }
+        });
+        jMenu6.add(jMenuItem4);
+
         jMenu4.add(jMenu6);
 
         jMenu3.setText("Customer");
@@ -716,15 +728,16 @@ public final class mainframe extends javax.swing.JFrame implements Observer {
 
         }
         
-        
-        
-        
         // get tab id to remove
-        
-        
-        
-        
+                
     }//GEN-LAST:event_jMenuItem2ActionPerformed
+
+    private void jMenuItem4ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jMenuItem4ActionPerformed
+        if (!Globals.ProductsFrame) {
+            prframe = new ProductForm(this);
+            Globals.ProductsFrame = true;
+        }
+    }//GEN-LAST:event_jMenuItem4ActionPerformed
 
     
 
@@ -747,6 +760,7 @@ public final class mainframe extends javax.swing.JFrame implements Observer {
     private javax.swing.JMenuItem jMenuItem1;
     private javax.swing.JMenuItem jMenuItem2;
     private javax.swing.JMenuItem jMenuItem3;
+    private javax.swing.JMenuItem jMenuItem4;
     private javax.swing.JPanel jPanel1;
     private javax.swing.JPanel jPanel2;
     private javax.swing.JScrollPane jScrollPane1;
