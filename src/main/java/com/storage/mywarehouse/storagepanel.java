@@ -10,6 +10,7 @@ import com.storage.mywarehouse.Entity.Entry;
 import com.storage.mywarehouse.Entity.Product;
 import com.storage.mywarehouse.Entity.Warehouse;
 import com.storage.mywarehouse.Hibernate.NewHibernateUtil;
+import com.storage.mywarehouse.View.WarehouseEntry;
 import com.storage.mywarehouse.View.WarehouseProduct;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -146,17 +147,17 @@ public class storagepanel extends javax.swing.JPanel {
         Session session = NewHibernateUtil.getSessionFactory().openSession();
         Transaction tx = session.beginTransaction();
 
-        rows = session.createQuery("FROM WarehouseProduct E where E.warehouse = '" + st_name+ "'").list();
+        rows = session.createQuery("FROM WarehouseEntry E where E.warehouseId = " + st_id).list();
         
         rows_entry = session.createQuery("FROM Entry E where E.warehouseId = " + st_id).list();
         
         jTable1.setModel(tableModel);
-        int r = 0;
-        for (Iterator it = rows_entry.iterator(); it.hasNext();) {
-            WarehouseProduct wp = (WarehouseProduct) it.next();
-            tableModel.addRow(new Object[]{wp.getProductId(), wp.getBrand(), wp.getType(), wp.getQuantity(), wp.getPrice()});
+//        int r = 0;
+        for (Iterator it = rows.iterator(); it.hasNext();) {
+            WarehouseEntry we = (WarehouseEntry) it.next();
+            tableModel.addRow(new Object[]{we.getProductId(), we.getBrand(), we.getType(), we.getQuantity(), we.getPrice()});
 
-            DbToRow.put(r, wp.getId());
+//            DbToRow.put(r, we.getId());
         }
 
         tx.commit();
