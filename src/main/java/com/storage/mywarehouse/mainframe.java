@@ -320,6 +320,7 @@ public final class mainframe extends javax.swing.JFrame implements Observer {
         jLabel3 = new javax.swing.JLabel();
         jLabel5 = new javax.swing.JLabel();
         dc_label = new javax.swing.JTextField();
+        searchParam = new javax.swing.JComboBox<>();
         jPanel2 = new javax.swing.JPanel();
         jScrollPane2 = new javax.swing.JScrollPane();
         reporter = new javax.swing.JTable();
@@ -396,7 +397,7 @@ public final class mainframe extends javax.swing.JFrame implements Observer {
             }
         });
 
-        jLabel2.setText("Enter code:");
+        jLabel2.setText("Search for:");
 
         jButton2.setText("Search");
         jButton2.addActionListener(new java.awt.event.ActionListener() {
@@ -420,6 +421,8 @@ public final class mainframe extends javax.swing.JFrame implements Observer {
         dc_label.setColumns(6);
         dc_label.setEnabled(false);
 
+        searchParam.setModel(new javax.swing.DefaultComboBoxModel<>(new String[] { "Code", "Brand", "Type" }));
+
         javax.swing.GroupLayout jPanel1Layout = new javax.swing.GroupLayout(jPanel1);
         jPanel1.setLayout(jPanel1Layout);
         jPanel1Layout.setHorizontalGroup(
@@ -430,8 +433,11 @@ public final class mainframe extends javax.swing.JFrame implements Observer {
                 .addContainerGap())
             .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, jPanel1Layout.createSequentialGroup()
                 .addGap(42, 42, 42)
-                .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addComponent(jLabel2)
+                .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
+                    .addGroup(jPanel1Layout.createSequentialGroup()
+                        .addComponent(jLabel2)
+                        .addGap(18, 18, 18)
+                        .addComponent(searchParam, 0, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
                     .addGroup(jPanel1Layout.createSequentialGroup()
                         .addComponent(searchfield, javax.swing.GroupLayout.PREFERRED_SIZE, 140, javax.swing.GroupLayout.PREFERRED_SIZE)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
@@ -457,11 +463,12 @@ public final class mainframe extends javax.swing.JFrame implements Observer {
             jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(jPanel1Layout.createSequentialGroup()
                 .addContainerGap()
-                .addComponent(jScrollPane1, javax.swing.GroupLayout.DEFAULT_SIZE, 342, Short.MAX_VALUE)
+                .addComponent(jScrollPane1, javax.swing.GroupLayout.DEFAULT_SIZE, 336, Short.MAX_VALUE)
                 .addGap(18, 18, 18)
                 .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                     .addComponent(jLabel2)
-                    .addComponent(jLabel1))
+                    .addComponent(jLabel1)
+                    .addComponent(searchParam, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                     .addComponent(searchfield, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
@@ -645,7 +652,7 @@ public final class mainframe extends javax.swing.JFrame implements Observer {
 
     private void jButton2ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton2ActionPerformed
 
-        if (searchfield.getText().length() > 2) {
+        if (searchfield.getText().length() > 0) {
 
             //first we clean the whole generic table
             int rows = tableModel.getRowCount();
@@ -653,6 +660,10 @@ public final class mainframe extends javax.swing.JFrame implements Observer {
                 tableModel.removeRow(0);
             }
 
+            // get what to search for
+            
+            String param = searchParam.getSelectedItem().toString();
+            
             //get the desired code
             String search_code = searchfield.getText();
 
@@ -661,7 +672,12 @@ public final class mainframe extends javax.swing.JFrame implements Observer {
             Session session = NewHibernateUtil.getSessionFactory().openSession();
             Transaction tx = session.beginTransaction();
             
-            productList = session.createQuery("FROM WarehouseProduct WP WHERE Code = "+ search_code).list();
+            if(param.equalsIgnoreCase("code")){
+                productList = session.createQuery("FROM WarehouseProduct WP WHERE WP.productId = "+ search_code).list();
+            }else{
+                productList = session.createQuery("FROM WarehouseProduct WP WHERE WP." + param.toLowerCase() +" = '"+ search_code + "'").list();
+            }
+            
             
             
             for (Iterator it = productList.iterator(); it.hasNext();) {
@@ -767,6 +783,7 @@ public final class mainframe extends javax.swing.JFrame implements Observer {
     private javax.swing.JScrollPane jScrollPane2;
     private javax.swing.JTable jTable1;
     private javax.swing.JTable reporter;
+    private javax.swing.JComboBox<String> searchParam;
     private javax.swing.JTextField searchfield;
     private javax.swing.JTabbedPane tab;
     // End of variables declaration//GEN-END:variables
