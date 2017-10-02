@@ -13,7 +13,7 @@ This is an open-source warehouse management system.
 ## How to contribute
 1. fork the repo to your own profile
 2. select an issue
-3. create a new branch with the name #issueNum_anyOtherNaming (3_myBranch)
+3. create a new branch with the name "feature/issueNum_anyOtherNaming" (feature/3_myBranch)
 4. write your code
 5. commit and push to your repo
 6. compare and pull request against this repo's master
