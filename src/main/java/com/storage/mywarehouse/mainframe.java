@@ -268,7 +268,7 @@ public final class mainframe extends javax.swing.JFrame implements Observer {
             for (Iterator it = reporterProductList.iterator(); it.hasNext();) {
                 WarehouseProduct pr = (WarehouseProduct) it.next();
 
-                tableModel.addRow(new Object[]{pr.getProductId(), pr.getBrand(), pr.getType(), pr.getQuantity(), pr.getWarehouse()});
+                tableModel_rep.addRow(new Object[]{pr.getProductId(), pr.getBrand(), pr.getType(), pr.getQuantity(), pr.getWarehouse()});
                 
             }
 

@@ -7,6 +7,7 @@
 package com.storage.mywarehouse;
 
 import com.storage.mywarehouse.Entity.Entry;
+import com.storage.mywarehouse.Entity.Product;
 import com.storage.mywarehouse.Entity.Warehouse;
 import com.storage.mywarehouse.Hibernate.NewHibernateUtil;
 import com.storage.mywarehouse.View.WarehouseProduct;
@@ -14,6 +15,8 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
+import javax.swing.JComboBox;
+import javax.swing.JDialog;
 import javax.swing.JOptionPane;
 import javax.swing.event.CellEditorListener;
 import javax.swing.event.ChangeEvent;
@@ -41,7 +44,7 @@ public class storagepanel extends javax.swing.JPanel {
     private int st_id;
 
     private HashMap<Integer, Integer> DbToRow;
-    private List rows;
+    private List rows, rows_entry;
     private final MyObservable observable = new MyObservable();
 
     public void setName(String n) {
@@ -58,6 +61,7 @@ public class storagepanel extends javax.swing.JPanel {
         observable.addObserver(frame);
 
         rows = new ArrayList<>();
+        rows_entry = new ArrayList<>();
         st_id = wh.getWarehouseId();
         st_name = wh.getName();
         warehouse = wh;
@@ -120,7 +124,7 @@ public class storagepanel extends javax.swing.JPanel {
     public void SaveEntry(int rowId) {
 
         if (rowId != -1) {
-            Entry e = (Entry) rows.get(rowId);
+            Entry e = (Entry) rows_entry.get(rowId);
 
             if (e != null) {
 
@@ -142,11 +146,13 @@ public class storagepanel extends javax.swing.JPanel {
         Session session = NewHibernateUtil.getSessionFactory().openSession();
         Transaction tx = session.beginTransaction();
 
-        rows = session.createQuery("FROM Entry E where E.warehouseId = " + st_id).list();
-
+        rows = session.createQuery("FROM WarehouseProduct E where E.warehouse = '" + st_name+ "'").list();
+        
+        rows_entry = session.createQuery("FROM Entry E where E.warehouseId = " + st_id).list();
+        
         jTable1.setModel(tableModel);
         int r = 0;
-        for (Iterator it = rows.iterator(); it.hasNext();) {
+        for (Iterator it = rows_entry.iterator(); it.hasNext();) {
             WarehouseProduct wp = (WarehouseProduct) it.next();
             tableModel.addRow(new Object[]{wp.getProductId(), wp.getBrand(), wp.getType(), wp.getQuantity(), wp.getPrice()});
 
@@ -260,7 +266,52 @@ public class storagepanel extends javax.swing.JPanel {
     }// </editor-fold>//GEN-END:initComponents
 
     private void jButton1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton1ActionPerformed
-        tableModel.addRow(new Object[]{"", "", "", "", ""});
+        
+        Session session = NewHibernateUtil.getSessionFactory().openSession();
+        Transaction tx = session.beginTransaction();
+
+        List products = session.createQuery("FROM Product").list();
+        Product prod = null;
+        String[] prodArray = new String[products.size()];
+        int i=0;
+        for(Iterator it = products.iterator(); it.hasNext();){
+            prod = (Product) it.next();
+            prodArray[i] = prod.getBrand() + "_" + prod.getType()+"_"+prod.getProductId();
+            i++;
+        }
+        
+        
+        JComboBox comboProd = new JComboBox(prodArray);
+        
+        String selectedProduct = (String) JOptionPane.showInputDialog(this, 
+        "PLease select your Product?",
+        "Product:",
+        JOptionPane.QUESTION_MESSAGE, 
+        null, 
+        prodArray, 
+        prodArray[0]);
+        
+        int prodId = Integer.parseInt(selectedProduct.substring(selectedProduct.lastIndexOf('_')+1));
+        
+        products = session.createQuery("FROM Product p WHERE p.productId = " + prodId).list();
+        
+        Product pr = (Product) products.get(0);
+        
+        List entries = session.createQuery("FROM Entry e ORDER BY e.entryId DESC").list();
+        
+        int entryId = entries.size() == 0 ? 0 : ((Entry) entries.get(0)).getEntryId() +1 ;
+        
+        Entry e = new Entry(entryId, st_id, prodId, 0);
+        
+        session.save(e);
+
+        tx.commit();
+        session.close();
+        
+        
+        tableModel.addRow(new Object[]{pr.getProductId(),pr.getBrand(), pr.getType(), 0, pr.getPrice()});
+        rows_entry.add(e);
+        
     }//GEN-LAST:event_jButton1ActionPerformed
 
     private void jTable1KeyTyped(java.awt.event.KeyEvent evt) {//GEN-FIRST:event_jTable1KeyTyped
@@ -287,8 +338,8 @@ public class storagepanel extends javax.swing.JPanel {
                 tableModel.removeRow(row);
             }
 
-            Entry e = (Entry) rows.get(row);
-            rows.remove(e);
+            Entry e = (Entry) rows_entry.get(row);
+            rows_entry.remove(e);
 
             Session session = NewHibernateUtil.getSessionFactory().openSession();
             Transaction tx = session.beginTransaction();
