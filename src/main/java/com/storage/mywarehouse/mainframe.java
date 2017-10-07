@@ -656,6 +656,7 @@ public final class mainframe extends javax.swing.JFrame implements Observer {
         String name = JOptionPane.showInputDialog(this, "Enter name for the new warehouse");
 
         if (name != null) {
+            JOptionPane.showMessageDialog(null, "Successfully added new warehouse.");
             Warehouse w  = AddNewWareHouse(name);
             panels.add(new storagepanel(w, this));
             warehouseList.add(w);
