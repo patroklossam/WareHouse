@@ -32,12 +32,6 @@ public class clientForm extends javax.swing.JFrame {
         Globals.ClientsFrame = true;
         
         setResizable(false);
-        addWindowListener(new java.awt.event.WindowAdapter() {
-            @Override
-            public void windowClosing(java.awt.event.WindowEvent windowEvent) {
-                dispose();
-            }
-        });
         
         initComponents();
     }
@@ -65,7 +59,7 @@ public class clientForm extends javax.swing.JFrame {
         jLabel1 = new javax.swing.JLabel();
         jLabel2 = new javax.swing.JLabel();
 
-        setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
+        setDefaultCloseOperation(javax.swing.WindowConstants.DO_NOTHING_ON_CLOSE);
         setTitle("Customer Registration Form");
 
         jLabel30.setText("First Name");
