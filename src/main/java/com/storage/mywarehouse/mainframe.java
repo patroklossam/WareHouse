@@ -258,7 +258,7 @@ public final class mainframe extends javax.swing.JFrame implements Observer {
         Transaction tx = session.beginTransaction();
         
         
-            reporterProductList = session.createQuery("FROM WarehouseProduct WP WHERE Quantity = 0").list();
+            reporterProductList = session.createQuery("FROM WarehouseProduct WP WHERE quantity = 0").list();
             
         tx.commit();
         session.close();
@@ -690,7 +690,7 @@ public final class mainframe extends javax.swing.JFrame implements Observer {
             Transaction tx = session.beginTransaction();
             
             if(param.equalsIgnoreCase("code")){
-                productList = session.createQuery("FROM WarehouseProduct WP WHERE WP.productId = "+ search_code).list();
+                productList = session.createQuery("FROM WarehouseProduct WP WHERE WP.productId = :search_code").setString("search_code", search_code).list();
             }else{
                 String equality = "";
                 if( matchBox.isSelected() ){
@@ -700,7 +700,7 @@ public final class mainframe extends javax.swing.JFrame implements Observer {
                     search_code = "%" +search_code+ "%";
                 }
                 
-                productList = session.createQuery("FROM WarehouseProduct WP WHERE WP." + param.toLowerCase() + equality +" '"+ search_code + "'").list();
+                productList = session.createQuery("FROM WarehouseProduct WP WHERE WP." + param.toLowerCase() + equality +" :search_code").setString("search_code", search_code).list();
             }
             
             
