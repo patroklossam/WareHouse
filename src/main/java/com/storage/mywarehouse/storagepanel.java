@@ -147,9 +147,9 @@ public class storagepanel extends javax.swing.JPanel {
         Session session = NewHibernateUtil.getSessionFactory().openSession();
         Transaction tx = session.beginTransaction();
 
-        rows = session.createQuery("FROM WarehouseEntry E where E.warehouseId = " + st_id).list();
+        rows = session.createQuery("FROM WarehouseEntry E where E.warehouseId = :st_id").setInteger("st_id", st_id).list();
         
-        rows_entry = session.createQuery("FROM Entry E where E.warehouseId = " + st_id).list();
+        rows_entry = session.createQuery("FROM Entry E where E.warehouseId = :st_id").setInteger("st_id", st_id).list();
         
         jTable1.setModel(tableModel);
 //        int r = 0;
@@ -294,7 +294,7 @@ public class storagepanel extends javax.swing.JPanel {
         
         int prodId = Integer.parseInt(selectedProduct.substring(selectedProduct.lastIndexOf('_')+1));
         
-        products = session.createQuery("FROM Product p WHERE p.productId = " + prodId).list();
+        products = session.createQuery("FROM Product p WHERE p.productId = :prodId").setInteger("prodId", prodId).list();
         
         Product pr = (Product) products.get(0);
         
