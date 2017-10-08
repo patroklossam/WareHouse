@@ -729,7 +729,8 @@ public final class mainframe extends javax.swing.JFrame implements Observer {
     }//GEN-LAST:event_jMenuItem3ActionPerformed
 
     private void clientComboActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_clientComboActionPerformed
-        if (evt.getActionCommand().equalsIgnoreCase("comboBoxChanged")) {
+        if (evt.getActionCommand().equalsIgnoreCase("comboBoxChanged")
+                && clientCombo.getItemCount() > 0) {
             int index = clientCombo.getSelectedIndex();
             if (index >= 0) {
                 dc_label.setText(customer_dc.get(index) + "");
