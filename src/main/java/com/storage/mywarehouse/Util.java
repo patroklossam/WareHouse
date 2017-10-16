@@ -54,9 +54,9 @@ public class Util {
                 productId = 0;
             }
             else{
-                productId = productWithHighestId.getProductId();
+                productId = productWithHighestId.getProductId()+1;
             }
-            Product p = new Product(++productId, brand, type,description, price);
+            Product p = new Product(productId, brand, type,description, price);
             tx = session.beginTransaction();
             session.save(p);
             tx.commit();
