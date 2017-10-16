@@ -50,7 +50,12 @@ public class Util {
             Transaction tx = session.beginTransaction();
             Product productWithHighestId = (Product) session.createCriteria(Product.class).addOrder(Order.desc("productId")).setMaxResults(1).uniqueResult();
             tx.commit();
-            productId = productWithHighestId.getProductId();
+            if(productWithHighestId == null){
+                productId = 0;
+            }
+            else{
+                productId = productWithHighestId.getProductId();
+            }
             Product p = new Product(++productId, brand, type,description, price);
             tx = session.beginTransaction();
             session.save(p);
