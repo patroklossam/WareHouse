@@ -19,7 +19,9 @@ import org.apache.commons.csv.CSVParser;
 import org.apache.commons.csv.CSVRecord;
 import org.hibernate.Session;
 import org.hibernate.Transaction;
+import org.hibernate.criterion.Criterion;
 import org.hibernate.criterion.Order;
+import org.hibernate.criterion.Restrictions;
 
 /**
  *
@@ -46,8 +48,16 @@ public class Util {
                 numberOfFailedRows++;
                 continue;
             }
-            int productId;
             Transaction tx = session.beginTransaction();
+            Product existingProduct = (Product) session.createCriteria(Product.class).add(Restrictions.and(Restrictions.eq("brand", brand),Restrictions.eq("type", type))).uniqueResult();
+            tx.commit();
+            if(existingProduct != null){
+                System.out.println("Product of brand "+brand+" and type "+type+" already exists!");
+                numberOfFailedRows++;
+                continue;
+            }
+            int productId;
+            tx = session.beginTransaction();
             Product productWithHighestId = (Product) session.createCriteria(Product.class).addOrder(Order.desc("productId")).setMaxResults(1).uniqueResult();
             tx.commit();
             if(productWithHighestId == null){
