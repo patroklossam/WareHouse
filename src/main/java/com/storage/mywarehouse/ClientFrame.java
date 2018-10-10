@@ -6,16 +6,12 @@
 package com.storage.mywarehouse;
 
 import com.storage.mywarehouse.Entity.Customer;
-import com.storage.mywarehouse.Entity.Entry;
 import com.storage.mywarehouse.Hibernate.NewHibernateUtil;
 import java.util.Collections;
 import java.util.Comparator;
-import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 import javax.swing.JOptionPane;
-import javax.swing.event.CellEditorListener;
-import javax.swing.event.ChangeEvent;
 import javax.swing.table.DefaultTableModel;
 import org.hibernate.Session;
 import org.hibernate.Transaction;
@@ -29,20 +25,19 @@ public final class ClientFrame extends javax.swing.JFrame {
     /**
      * Creates new form ClientFrame
      */
-    
     private final mainframe frame;
-    
+
     private DefaultTableModel tbmodel;
-    
+
     private final MyObservable observable = new MyObservable();
     private List customers;
-        
+
     public ClientFrame(mainframe frame, final List customers) {
-        
+
         observable.addObserver(frame);
-        
+
         setResizable(false);
-        
+
         this.customers = customers;
         addWindowListener(new java.awt.event.WindowAdapter() {
             @Override
@@ -50,63 +45,41 @@ public final class ClientFrame extends javax.swing.JFrame {
                 Globals.ClientsFrame = false;
             }
         });
-        
+
         this.frame = frame;
         initComponents();
-        
-        
-        tbmodel = new DefaultTableModel(new Object[]{"Last Name","First Name","Occupation","Discount"},0){
+
+        tbmodel = new DefaultTableModel(new Object[]{"Last Name", "First Name", "Occupation", "Discount"}, 0) {
             @Override
             public boolean isCellEditable(int row, int column) {
                 return false;
             }
         };
-        
-        jTable1.setModel(tbmodel);
-        
-        jTable1.getDefaultEditor(String.class).addCellEditorListener(
-                new CellEditorListener() {
-                    public void editingCanceled(ChangeEvent e) {
-                        System.out.println("editingCanceled");
-                    }
 
-                    public void editingStopped(ChangeEvent e) {
-                        System.out.println("editingStopped: apply additional action");
-                        
-                        save();
-                        observable.changeData("refresh_clients");
-                    }
-                });
-        
+        jTable1.setModel(tbmodel);
+
         refreshClients(customers);
         setVisible(true);
         setDefaultCloseOperation(DISPOSE_ON_CLOSE);
-        
+
     }
-    
-    public void save(){
-        //decompose to triples
-        
-            
-    }
-    
-    
-    
-    public void refreshClients(List customers){
+
+    public void refreshClients(List customers) {
         this.customers = customers;
         int rows = tbmodel.getRowCount();
-        
+
         Collections.sort(customers, new ComparatorImpl());
-        
+
         //empty client table
-        for(int i=0;i<rows;i++)
+        for (int i = 0; i < rows; i++) {
             tbmodel.removeRow(0);
+        }
         for (Iterator it = customers.iterator(); it.hasNext();) {
             Customer customer = (Customer) it.next();
             String fname = customer.getName();
-            tbmodel.addRow(new Object[]{customer.getLastName(),customer.getName(),customer.getOccupation(),customer.getDiscount()});
+            tbmodel.addRow(new Object[]{customer.getLastName(), customer.getName(), customer.getOccupation(), customer.getDiscount()});
         }
-        
+
     }
 
     /**
@@ -246,7 +219,7 @@ public final class ClientFrame extends javax.swing.JFrame {
     private void jButton2ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton2ActionPerformed
         int row = jTable1.getSelectedRow();
         if (row != -1) {
-            
+
             Customer c = (Customer) customers.get(row);
 
             clientForm clf = new clientForm(frame, c);
@@ -258,7 +231,6 @@ public final class ClientFrame extends javax.swing.JFrame {
         }
     }//GEN-LAST:event_jButton2ActionPerformed
 
-  
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JButton jButton1;
@@ -276,10 +248,10 @@ public final class ClientFrame extends javax.swing.JFrame {
 
         @Override
         public int compare(Customer o1, Customer o2) {
-            
+
             // descending order (ascending order would be:
             // o1.getGrade()-o2.getGrade())
-            return (o1.getLastName() + " " +  o1.getLastName() ).compareTo(o2.getLastName() + " " +  o2.getLastName());
+            return (o1.getLastName() + " " + o1.getLastName()).compareTo(o2.getLastName() + " " + o2.getLastName());
         }
     }
 }

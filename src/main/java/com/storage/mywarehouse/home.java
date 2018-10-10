@@ -4,7 +4,6 @@
  *
  * Copyright ownership: Patroklos Samaras
  */
-
 package com.storage.mywarehouse;
 
 import java.io.BufferedInputStream;
@@ -34,7 +33,7 @@ public class home extends javax.swing.JFrame {
      * Creates new form home
      */
     public home() {
-        
+
         initComponents();
         setResizable(false);
         setLocationRelativeTo(null);
@@ -118,8 +117,8 @@ public class home extends javax.swing.JFrame {
     }// </editor-fold>//GEN-END:initComponents
 
     private void jButton1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton1ActionPerformed
-        
-        if(pf.getPassword().length!=0){
+
+        if (pf.getPassword().length != 0) {
             DataInputStream in = null;
             try {
                 String passwordToHash = new String(pf.getPassword());
@@ -128,9 +127,8 @@ public class home extends javax.swing.JFrame {
                 in = new DataInputStream(new BufferedInputStream(new FileInputStream("00121.idx")));
                 String ps = in.readUTF();
                 in.close();
-                
-                
-                if(ps.equals(securePassword)){
+
+                if (ps.equals(securePassword)) {
                     new mainframe().setVisible(true);
                     dispose();
                 }
@@ -147,17 +145,17 @@ public class home extends javax.swing.JFrame {
             }
 
         }
-            
+
     }//GEN-LAST:event_jButton1ActionPerformed
 
     private void jButton2ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton2ActionPerformed
         JPasswordField pf = new JPasswordField();
-        
+
         JPasswordField pfn = new JPasswordField();
         JPasswordField pfnn = new JPasswordField();
         int okCxl = JOptionPane.showConfirmDialog(this, pf, "Enter your old Password", JOptionPane.OK_CANCEL_OPTION);
-        if (okCxl == JOptionPane.OK_OPTION){
-        
+        if (okCxl == JOptionPane.OK_OPTION) {
+
             String pass = new String(pf.getPassword());
             pf.setText("");
             String salt = "a7a89b201bf6d991";
@@ -169,76 +167,73 @@ public class home extends javax.swing.JFrame {
 
                 String ps = in.readUTF();
                 in.close();
-                if(!ps.equals(securePassword)){
+                if (!ps.equals(securePassword)) {
                     okCxl = JOptionPane.showConfirmDialog(this, pfn, "Enter your new Password", JOptionPane.OK_CANCEL_OPTION);
-                    if (okCxl == JOptionPane.OK_OPTION){
+                    if (okCxl == JOptionPane.OK_OPTION) {
                         okCxl = JOptionPane.showConfirmDialog(this, pfnn, "Re-Enter your new Password", JOptionPane.OK_CANCEL_OPTION);
-                        if(okCxl == JOptionPane.OK_OPTION){
+                        if (okCxl == JOptionPane.OK_OPTION) {
                             String a = new String(pfn.getPassword());
                             String b = new String(pfnn.getPassword());
 
                             pfn.setText("");
                             pfnn.setText("");
 
-                            if(a.equals(b)){
+                            if (a.equals(b)) {
                                 securePassword = get_SHA_256_SecurePassword(a, salt);
 
-                                a="";
-                                b="";
+                                a = "";
+                                b = "";
                                 DataOutputStream out = new DataOutputStream(new BufferedOutputStream(new FileOutputStream("00121.idx")));
 
                                 out.writeUTF(securePassword);
                                 out.close();
-                                securePassword="";
-                            }else{
+                                securePassword = "";
+                            } else {
                                 JOptionPane.showMessageDialog(this, "Passwords do not match");
                             }
                         }
                     }
-                }else{
+                } else {
                     JOptionPane.showMessageDialog(this, "Wrong old password");
                 }
-            
+
             } catch (FileNotFoundException ex) {
                 Logger.getLogger(home.class.getName()).log(Level.SEVERE, null, ex);
             } catch (IOException ex) {
                 Logger.getLogger(home.class.getName()).log(Level.SEVERE, null, ex);
             }
         }
-        
-        
+
+
     }//GEN-LAST:event_jButton2ActionPerformed
 
     private void pfActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_pfActionPerformed
-         jButton1ActionPerformed(evt);
+        jButton1ActionPerformed(evt);
     }//GEN-LAST:event_pfActionPerformed
-    private static String getSalt() throws NoSuchAlgorithmException{
+    private static String getSalt() throws NoSuchAlgorithmException {
         SecureRandom sr = SecureRandom.getInstance("SHA1PRNG");
         byte[] salt = new byte[16];
         sr.nextBytes(salt);
         return salt.toString();
     }
-    
-    private static String get_SHA_256_SecurePassword(String passwordToHash, String salt)
-    {
+
+    private static String get_SHA_256_SecurePassword(String passwordToHash, String salt) {
         String generatedPassword = null;
         try {
             MessageDigest md = MessageDigest.getInstance("SHA-256");
             md.update(salt.getBytes());
             byte[] bytes = md.digest(passwordToHash.getBytes());
             StringBuilder sb = new StringBuilder();
-            for(int i=0; i< bytes.length ;i++)
-            {
+            for (int i = 0; i < bytes.length; i++) {
                 sb.append(Integer.toString((bytes[i] & 0xff) + 0x100, 16).substring(1));
             }
             generatedPassword = sb.toString();
-        }
-        catch (NoSuchAlgorithmException e)
-        {
+        } catch (NoSuchAlgorithmException e) {
             e.printStackTrace();
         }
         return generatedPassword;
     }
+
     /**
      * @param args the command line arguments
      */
