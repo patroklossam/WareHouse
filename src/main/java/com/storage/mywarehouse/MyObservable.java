@@ -4,7 +4,6 @@
  *
  * Copyright ownership: Patroklos Samaras
  */
-
 package com.storage.mywarehouse;
 
 import java.util.Observable;
@@ -14,9 +13,11 @@ import java.util.Observable;
  * @author Patroklos
  */
 class MyObservable extends Observable {
-    MyObservable() {	
+
+    MyObservable() {
         super();
     }
+
     void changeData(Object data) {
         setChanged(); // the two methods of Observable class
         notifyObservers(data);

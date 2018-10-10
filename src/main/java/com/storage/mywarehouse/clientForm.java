@@ -32,27 +32,27 @@ public class clientForm extends javax.swing.JFrame {
         update = false;
         observable.addObserver(frame);
         Globals.ClientsFrame = true;
-        
+
         setResizable(false);
-        
+
         initComponents();
     }
-    
+
     public clientForm(mainframe frame, Customer customer) {
         this.customer = customer;
         update = true;
         observable.addObserver(frame);
         Globals.ClientsFrame = true;
-        
+
         setResizable(false);
-        
+
         initComponents();
-        
+
         clientName.setText(customer.getName());
         clientSurname.setText(customer.getLastName());
         clientJob.setText(customer.getOccupation());
-        discount.setText(""+customer.getDiscount());    
-        
+        discount.setText("" + customer.getDiscount());
+
         jButton1.setText("Update");
     }
 
@@ -194,10 +194,10 @@ public class clientForm extends javax.swing.JFrame {
     private void jButton1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton1ActionPerformed
 
         Session session = NewHibernateUtil.getSessionFactory().openSession();
-        customer = new Customer();  
+        customer = new Customer();
         Transaction tx = null;
-        
-        if(!update){
+
+        if (!update) {
             tx = session.beginTransaction();
             List customerList = session.createQuery("FROM Customer c ORDER BY c.customerId DESC").list();
 
@@ -207,10 +207,10 @@ public class clientForm extends javax.swing.JFrame {
                 nextId = cLast.getCustomerId() + 1;
             }
             tx.commit();
-            
+
             customer.setCustomerId(nextId);
         }
-        
+
         String cName = "";
         String cLastName = "";
         String full_job;
@@ -238,18 +238,18 @@ public class clientForm extends javax.swing.JFrame {
         customer.setDiscount(full_dc);
 
         tx = session.beginTransaction();
-        if(update){
+        if (update) {
             session.update(customer);
-        }else{
+        } else {
             session.save(customer);
         }
         tx.commit();
         session.close();
 
         observable.changeData("refresh_clients");
-        if(update){
+        if (update) {
             JOptionPane.showMessageDialog((Component) null, "Customer is up to date!");
-        }else{
+        } else {
             JOptionPane.showMessageDialog((Component) null, "New customer saved!");
         }
         Globals.ClientsFrame = false;

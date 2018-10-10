@@ -55,7 +55,6 @@ public final class mainframe extends javax.swing.JFrame implements Observer {
     /**
      * Creates new form mainframe
      */
-    
     private ProductForm prframe;
     private ClientFrame clframe;
     private List customers;
@@ -78,19 +77,19 @@ public final class mainframe extends javax.swing.JFrame implements Observer {
                 break;
         }
     }
-    
-    public List<storagepanel> getPanels(){
+
+    public List<storagepanel> getPanels() {
         return panels;
     }
 
-    public List<Warehouse> getWarehouses(){
+    public List<Warehouse> getWarehouses() {
         return warehouseList;
     }
-    
-    public JTabbedPane getTabs(){
+
+    public JTabbedPane getTabs() {
         return tab;
     }
-    
+
     public void refreshCustomers() {
         customers = new ArrayList<>();
 
@@ -103,7 +102,7 @@ public final class mainframe extends javax.swing.JFrame implements Observer {
         Transaction tx = session.beginTransaction();
 
         customers = session.createQuery("FROM Customer").list();
-        
+
         tx.commit();
         session.close();
 
@@ -124,7 +123,6 @@ public final class mainframe extends javax.swing.JFrame implements Observer {
 
     }
 
-
     public mainframe() {
 
         panels = new ArrayList<>();
@@ -135,7 +133,6 @@ public final class mainframe extends javax.swing.JFrame implements Observer {
 
         setTitle("StoreHouse");
 
-        //
         tableModel = new DefaultTableModel(new Object[]{"Code", "Brand", "Type", "Total Amount", "Warehouse", "Price", "Price after Discount"}, 0);
         jTable1.setModel(tableModel);
         tableModel_rep = new DefaultTableModel(new Object[]{"Code", "Brand", "Type", "Quantity", "Warehouse"}, 0);
@@ -183,29 +180,27 @@ public final class mainframe extends javax.swing.JFrame implements Observer {
         tab.addChangeListener(l);
         tab.addMouseListener(l);
 
-        
         Session session = NewHibernateUtil.getSessionFactory().openSession();
         Transaction tx = session.beginTransaction();
-        
+
         List warehouseList = session.createQuery("FROM Warehouse").list();
-        
-        if(warehouseList.isEmpty() ){
+
+        if (warehouseList.isEmpty()) {
             JOptionPane.showMessageDialog(this, "No previous configuration found. The program will initiate in a clean state.");
         }
-        
+
         for (Iterator it = warehouseList.iterator(); it.hasNext();) {
             Warehouse w = (Warehouse) it.next();
-            
+
             panels.add(new storagepanel(w, this));
-            panels.get(panels.size()-1).Load();
-            
-            tab.add(w.getName(), panels.get(panels.size()-1));
+            panels.get(panels.size() - 1).Load();
+
+            tab.add(w.getName(), panels.get(panels.size() - 1));
         }
-        
+
         tx.commit();
         session.close();
-        
-        
+
         fillInReporter();
 
         //load customers
@@ -226,7 +221,6 @@ public final class mainframe extends javax.swing.JFrame implements Observer {
         }
     }
 
-
     public void fillInReporter() {
 
         //clean reporter
@@ -234,27 +228,24 @@ public final class mainframe extends javax.swing.JFrame implements Observer {
         for (int i = 0; i < rows; i++) {
             tableModel_rep.removeRow(0);
         }
-        
+
         Session session = NewHibernateUtil.getSessionFactory().openSession();
         Transaction tx = session.beginTransaction();
-        
-        
-            reporterProductList = session.createQuery("FROM WarehouseProduct WP WHERE quantity = 0").list();
-            
+
+        reporterProductList = session.createQuery("FROM WarehouseProduct WP WHERE quantity = 0").list();
+
         tx.commit();
         session.close();
-            
-            // fill in table with zero quantities
-            
-            for (Iterator it = reporterProductList.iterator(); it.hasNext();) {
-                WarehouseProduct pr = (WarehouseProduct) it.next();
 
-                tableModel_rep.addRow(new Object[]{pr.getProductId(), pr.getBrand(), pr.getType(), pr.getQuantity(), pr.getWarehouse()});
-                
-            }
+        // fill in table with zero quantities
+        for (Iterator it = reporterProductList.iterator(); it.hasNext();) {
+            WarehouseProduct pr = (WarehouseProduct) it.next();
+
+            tableModel_rep.addRow(new Object[]{pr.getProductId(), pr.getBrand(), pr.getType(), pr.getQuantity(), pr.getWarehouse()});
+
+        }
 
     }
-
 
     /**
      * This method is called from within the constructor to initialize the form.
@@ -631,13 +622,13 @@ public final class mainframe extends javax.swing.JFrame implements Observer {
         String name = JOptionPane.showInputDialog(this, "Enter name for the new warehouse");
 
         if (name != null) {
-            
+
             Session session = NewHibernateUtil.getSessionFactory().openSession();
             int retcode = Util.addWarehouse(session, name, this);
-            
-            if(retcode < 0 ){
+
+            if (retcode < 0) {
                 JOptionPane.showMessageDialog(null, "Warehouse exists!");
-            }else{
+            } else {
                 JOptionPane.showMessageDialog(null, "Successfully added new warehouse.");
             }
             session.close();
@@ -658,44 +649,40 @@ public final class mainframe extends javax.swing.JFrame implements Observer {
             }
 
             // get what to search for
-            
             String param = searchParam.getSelectedItem().toString();
-            
+
             //get the desired code
             String search_code = searchfield.getText();
 
             // fill the table with rows that contain this code ONLY
-            
             Session session = NewHibernateUtil.getSessionFactory().openSession();
             Transaction tx = session.beginTransaction();
-            
-            if(param.equalsIgnoreCase("code")){
+
+            if (param.equalsIgnoreCase("code")) {
                 productList = session.createQuery("FROM WarehouseProduct WP WHERE WP.productId = :search_code").setString("search_code", search_code).list();
-            }else{
+            } else {
                 String equality = "";
-                if( matchBox.isSelected() ){
+                if (matchBox.isSelected()) {
                     equality = " = ";
-                }else{
+                } else {
                     equality = " LIKE ";
-                    search_code = "%" +search_code+ "%";
+                    search_code = "%" + search_code + "%";
                 }
-                
-                productList = session.createQuery("FROM WarehouseProduct WP WHERE WP." + param.toLowerCase() + equality +" :search_code").setString("search_code", search_code).list();
+
+                productList = session.createQuery("FROM WarehouseProduct WP WHERE WP." + param.toLowerCase() + equality + " :search_code").setString("search_code", search_code).list();
             }
-            
-            
-            
+
             for (Iterator it = productList.iterator(); it.hasNext();) {
                 WarehouseProduct pr = (WarehouseProduct) it.next();
-                
+
                 double init_pr = pr.getPrice();
                 double dc = Double.parseDouble(dc_label.getText());
                 double dc_pr = init_pr * dc / 100;
 
                 tableModel.addRow(new Object[]{pr.getProductId(), pr.getBrand(), pr.getType(), pr.getQuantity(), pr.getWarehouse(), init_pr, init_pr - dc_pr});
-                
+
             }
-            
+
             tx.commit();
             session.close();
         }
@@ -729,29 +716,22 @@ public final class mainframe extends javax.swing.JFrame implements Observer {
     }//GEN-LAST:event_clientComboActionPerformed
 
     private void jMenuItem2ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jMenuItem2ActionPerformed
-        // TODO add your handling code here:
-        
-        //
-        
         int tabId = tab.getSelectedIndex();
-        if(tabId > 1){
-            
+        if (tabId > 1) {
+
             Session session = NewHibernateUtil.getSessionFactory().openSession();
             Transaction tx = session.beginTransaction();
-            
-            
-            
-            session.delete(panels.get(tabId-2).getWarehouse());
+
+            session.delete(panels.get(tabId - 2).getWarehouse());
             tx.commit();
             session.close();
-            
+
             tab.remove(tabId);
-            panels.remove(tabId-2);
+            panels.remove(tabId - 2);
 
         }
-        
-        // get tab id to remove
-                
+
+
     }//GEN-LAST:event_jMenuItem2ActionPerformed
 
     private void jMenuItem4ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jMenuItem4ActionPerformed
@@ -770,7 +750,7 @@ public final class mainframe extends javax.swing.JFrame implements Observer {
         FileNameExtensionFilter typeFilter = new FileNameExtensionFilter("CSV file", ".csv");
         jfc.setFileFilter(typeFilter);
         int returnValue = jfc.showOpenDialog(null);
-        if(returnValue == JFileChooser.APPROVE_OPTION){
+        if (returnValue == JFileChooser.APPROVE_OPTION) {
             try {
                 String resultOfParsing = Util.parseProducts(jfc.getSelectedFile());
                 JOptionPane.showMessageDialog(null, resultOfParsing);
@@ -785,7 +765,7 @@ public final class mainframe extends javax.swing.JFrame implements Observer {
         FileNameExtensionFilter typeFilter = new FileNameExtensionFilter("CSV file", ".csv");
         jfc.setFileFilter(typeFilter);
         int returnValue = jfc.showOpenDialog(null);
-        if(returnValue == JFileChooser.APPROVE_OPTION){
+        if (returnValue == JFileChooser.APPROVE_OPTION) {
             try {
                 String resultOfParsing = Util.parseWarehouses(jfc.getSelectedFile(), this);
                 JOptionPane.showMessageDialog(null, resultOfParsing);
@@ -795,7 +775,6 @@ public final class mainframe extends javax.swing.JFrame implements Observer {
         }
     }//GEN-LAST:event_jMenuItem6ActionPerformed
 
-    
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JComboBox clientCombo;
@@ -831,7 +810,6 @@ public final class mainframe extends javax.swing.JFrame implements Observer {
     private javax.swing.JTabbedPane tab;
     // End of variables declaration//GEN-END:variables
 }
-
 
 class TabTitleEditListener extends MouseAdapter implements ChangeListener {
 
@@ -925,20 +903,20 @@ class TabTitleEditListener extends MouseAdapter implements ChangeListener {
 
     private void renameTabTitle() {
         String title = editor.getText().trim();
-        
+
         if (editing_idx >= 0 && !title.isEmpty()) {
             tabbedPane.setTitleAt(editing_idx, title);
-            
+
             panels.get(editing_idx - 2).setName(title);
             Warehouse wh = panels.get(editing_idx - 2).getWarehouse();
             wh.setName(title);
-            
+
             Session session = NewHibernateUtil.getSessionFactory().openSession();
             Transaction tx = session.beginTransaction();
             session.update(wh);
             tx.commit();
             session.close();
-            
+
         }
         cancelEditing();
         observable.changeData("refresh");

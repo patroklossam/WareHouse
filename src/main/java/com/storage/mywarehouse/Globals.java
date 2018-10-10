@@ -10,6 +10,7 @@ package com.storage.mywarehouse;
  * @author Patroklos
  */
 public class Globals {
+
     public static boolean ClientsFrame = false;
     public static boolean ProductsFrame = false;
 }

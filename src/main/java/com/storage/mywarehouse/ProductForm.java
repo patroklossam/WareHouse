@@ -5,7 +5,6 @@
  */
 package com.storage.mywarehouse;
 
-import com.storage.mywarehouse.Entity.Customer;
 import com.storage.mywarehouse.Entity.Product;
 import com.storage.mywarehouse.Hibernate.NewHibernateUtil;
 import java.awt.Component;
@@ -222,7 +221,6 @@ public class ProductForm extends javax.swing.JFrame {
         tx.commit();
         session.close();
 
-//        observable.changeData("refresh_clients");
         JOptionPane.showMessageDialog((Component) null, "New Product saved");
 
         Globals.ProductsFrame = false;
