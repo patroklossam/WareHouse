@@ -114,6 +114,7 @@ public class Util {
             System.out.println("Warehouse "+name+" already exists!");
             return -1;
         }
+        tx = session.beginTransaction();
         int warehouseId;
         Warehouse withHighestId = (Warehouse) session.createCriteria(Warehouse.class).addOrder(Order.desc("warehouseId")).setMaxResults(1).uniqueResult();
         tx.commit();

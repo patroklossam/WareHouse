@@ -255,30 +255,6 @@ public final class mainframe extends javax.swing.JFrame implements Observer {
 
     }
 
-    
-
-    private Warehouse AddNewWareHouse(String name) {
-        
-        
-        Session session = NewHibernateUtil.getSessionFactory().openSession();
-        Transaction tx = session.beginTransaction();
-        
-        List whs = session.createQuery("FROM Warehouse W ORDER BY W.warehouseId DESC").list();
-        
-        int nextId = 0;
-        
-        if(whs.size() > 0 ){
-            Warehouse w = (Warehouse) whs.get(0);
-            nextId = w.getWarehouseId() +1;
-        }
-        
-        Warehouse wh = new Warehouse(nextId, name);
-        session.save(wh);
-        tx.commit();
-        session.close();
-        
-        return(wh);
-    }
 
     /**
      * This method is called from within the constructor to initialize the form.
@@ -655,11 +631,16 @@ public final class mainframe extends javax.swing.JFrame implements Observer {
         String name = JOptionPane.showInputDialog(this, "Enter name for the new warehouse");
 
         if (name != null) {
-            JOptionPane.showMessageDialog(null, "Successfully added new warehouse.");
-            Warehouse w  = AddNewWareHouse(name);
-            panels.add(new storagepanel(w, this));
-            warehouseList.add(w);
-            tab.add(name, panels.get(panels.size() - 1));
+            
+            Session session = NewHibernateUtil.getSessionFactory().openSession();
+            int retcode = Util.addWarehouse(session, name, this);
+            
+            if(retcode < 0 ){
+                JOptionPane.showMessageDialog(null, "Warehouse exists!");
+            }else{
+                JOptionPane.showMessageDialog(null, "Successfully added new warehouse.");
+            }
+            session.close();
         }
     }//GEN-LAST:event_jMenuItem1ActionPerformed
 
