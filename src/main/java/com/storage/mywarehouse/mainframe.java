@@ -78,7 +78,19 @@ public final class mainframe extends javax.swing.JFrame implements Observer {
                 break;
         }
     }
+    
+    public List<storagepanel> getPanels(){
+        return panels;
+    }
 
+    public List<Warehouse> getWarehouses(){
+        return warehouseList;
+    }
+    
+    public JTabbedPane getTabs(){
+        return tab;
+    }
+    
     public void refreshCustomers() {
         customers = new ArrayList<>();
 
@@ -114,12 +126,6 @@ public final class mainframe extends javax.swing.JFrame implements Observer {
 
 
     public mainframe() {
-//        addWindowListener(new java.awt.event.WindowAdapter() {
-//            @Override
-//            public void windowClosing(java.awt.event.WindowEvent windowEvent) {
-//                
-//            }
-//        });
 
         panels = new ArrayList<>();
         warehouseList = new ArrayList<>();
@@ -220,36 +226,6 @@ public final class mainframe extends javax.swing.JFrame implements Observer {
         }
     }
 
-//    public void refreshIndex() {
-//        for (int i = 0; i < panels.size(); i++) {
-//            int rows = panels.get(i).getTableModel().getRowCount();
-//            String[] temp;
-//
-//            int q;
-//            for (int j = 0; j < rows; j++) {
-//                temp = new String[3];
-//                q = 0;
-//
-//                temp[0] = (String) panels.get(i).getTableModel().getValueAt(j, 0);
-//                temp[1] = (String) panels.get(i).getTableModel().getValueAt(j, 1);
-//                temp[2] = (String) panels.get(i).getTableModel().getValueAt(j, 2);
-//
-//                MyTriple<String, String, String> tpl = new MyTriple<>(temp[0], temp[1], temp[2]);
-//                q = Integer.parseInt((String) panels.get(i).getTableModel().getValueAt(j, 3));
-//
-//                // me apothikes
-//                if (products.containsKey(tpl)) {
-//                    MyTriple<Integer, String, Double> tp = new MyTriple<>(products.get(tpl).getLeft() + q, products.get(tpl).getMiddle() + ", " + tab.getTitleAt(i + 2), Double.parseDouble(panels.get(i).getTableModel().getValueAt(j, 4).toString()));
-//                    products.put(tpl, tp);
-//                } else {
-//                    MyTriple<Integer, String, Double> tp = new MyTriple<>(q, tab.getTitleAt(i + 2), Double.parseDouble(panels.get(i).getTableModel().getValueAt(j, 4).toString()));
-//                    products.put(tpl, tp);
-//                }
-//            }
-//
-//        }
-//        
-//    }
 
     public void fillInReporter() {
 
@@ -342,6 +318,7 @@ public final class mainframe extends javax.swing.JFrame implements Observer {
         jMenuItem3 = new javax.swing.JMenuItem();
         jMenu5 = new javax.swing.JMenu();
         jMenuItem1 = new javax.swing.JMenuItem();
+        jMenuItem6 = new javax.swing.JMenuItem();
         jMenuItem2 = new javax.swing.JMenuItem();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
@@ -632,6 +609,14 @@ public final class mainframe extends javax.swing.JFrame implements Observer {
         });
         jMenu5.add(jMenuItem1);
 
+        jMenuItem6.setText("Import from file");
+        jMenuItem6.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jMenuItem6ActionPerformed(evt);
+            }
+        });
+        jMenu5.add(jMenuItem6);
+
         jMenuItem2.setAccelerator(javax.swing.KeyStroke.getKeyStroke(java.awt.event.KeyEvent.VK_X, java.awt.event.InputEvent.ALT_MASK | java.awt.event.InputEvent.SHIFT_MASK | java.awt.event.InputEvent.CTRL_MASK));
         jMenuItem2.setText("Delete Selected Warehouse");
         jMenuItem2.addActionListener(new java.awt.event.ActionListener() {
@@ -814,6 +799,21 @@ public final class mainframe extends javax.swing.JFrame implements Observer {
         }
     }//GEN-LAST:event_jMenuItem5ActionPerformed
 
+    private void jMenuItem6ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jMenuItem6ActionPerformed
+        JFileChooser jfc = new JFileChooser();
+        FileNameExtensionFilter typeFilter = new FileNameExtensionFilter("CSV file", ".csv");
+        jfc.setFileFilter(typeFilter);
+        int returnValue = jfc.showOpenDialog(null);
+        if(returnValue == JFileChooser.APPROVE_OPTION){
+            try {
+                String resultOfParsing = Util.parseWarehouses(jfc.getSelectedFile(), this);
+                JOptionPane.showMessageDialog(null, resultOfParsing);
+            } catch (IOException ex) {
+                Logger.getLogger(mainframe.class.getName()).log(Level.SEVERE, null, ex);
+            }
+        }
+    }//GEN-LAST:event_jMenuItem6ActionPerformed
+
     
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
@@ -837,6 +837,7 @@ public final class mainframe extends javax.swing.JFrame implements Observer {
     private javax.swing.JMenuItem jMenuItem3;
     private javax.swing.JMenuItem jMenuItem4;
     private javax.swing.JMenuItem jMenuItem5;
+    private javax.swing.JMenuItem jMenuItem6;
     private javax.swing.JPanel jPanel1;
     private javax.swing.JPanel jPanel2;
     private javax.swing.JScrollPane jScrollPane1;
