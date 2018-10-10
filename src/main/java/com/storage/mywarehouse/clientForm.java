@@ -20,6 +20,8 @@ import org.hibernate.Transaction;
 public class clientForm extends javax.swing.JFrame {
 
     private final MyObservable observable = new MyObservable();
+    private boolean update = false;
+    private Customer customer;
 
     /**
      * Creates new form clientForm
@@ -27,13 +29,31 @@ public class clientForm extends javax.swing.JFrame {
      * @param frame for use in observer
      */
     public clientForm(mainframe frame) {
-        
+        update = false;
         observable.addObserver(frame);
         Globals.ClientsFrame = true;
         
         setResizable(false);
         
         initComponents();
+    }
+    
+    public clientForm(mainframe frame, Customer customer) {
+        this.customer = customer;
+        update = true;
+        observable.addObserver(frame);
+        Globals.ClientsFrame = true;
+        
+        setResizable(false);
+        
+        initComponents();
+        
+        clientName.setText(customer.getName());
+        clientSurname.setText(customer.getLastName());
+        clientJob.setText(customer.getOccupation());
+        discount.setText(""+customer.getDiscount());    
+        
+        jButton1.setText("Update");
     }
 
     /**
@@ -174,18 +194,23 @@ public class clientForm extends javax.swing.JFrame {
     private void jButton1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton1ActionPerformed
 
         Session session = NewHibernateUtil.getSessionFactory().openSession();
+        customer = new Customer();  
+        Transaction tx = null;
+        
+        if(!update){
+            tx = session.beginTransaction();
+            List customerList = session.createQuery("FROM Customer c ORDER BY c.customerId DESC").list();
 
-        Transaction tx = session.beginTransaction();
-
-        List customerList = session.createQuery("FROM Customer c ORDER BY c.customerId DESC").list();
-
-        int nextId = 0;
-        if (customerList.size() > 0) {
-            Customer cLast = (Customer) customerList.get(0);
-            nextId = cLast.getCustomerId() + 1;
+            int nextId = 0;
+            if (customerList.size() > 0) {
+                Customer cLast = (Customer) customerList.get(0);
+                nextId = cLast.getCustomerId() + 1;
+            }
+            tx.commit();
+            
+            customer.setCustomerId(nextId);
         }
-        tx.commit();
-
+        
         String cName = "";
         String cLastName = "";
         String full_job;
@@ -207,16 +232,26 @@ public class clientForm extends javax.swing.JFrame {
             full_dc = 0.0;
         }
 
-        Customer cust = new Customer(nextId, cName, cLastName, full_job, full_dc);
+        customer.setName(cName);
+        customer.setLastName(cLastName);
+        customer.setOccupation(full_job);
+        customer.setDiscount(full_dc);
 
         tx = session.beginTransaction();
-        session.save(cust);
+        if(update){
+            session.update(customer);
+        }else{
+            session.save(customer);
+        }
         tx.commit();
         session.close();
 
         observable.changeData("refresh_clients");
-        JOptionPane.showMessageDialog((Component) null, "New customer saved");
-
+        if(update){
+            JOptionPane.showMessageDialog((Component) null, "Customer is up to date!");
+        }else{
+            JOptionPane.showMessageDialog((Component) null, "New customer saved!");
+        }
         Globals.ClientsFrame = false;
         dispose();
 
