@@ -6,12 +6,14 @@
 package com.storage.mywarehouse;
 
 import com.storage.mywarehouse.Entity.Customer;
+import com.storage.mywarehouse.Entity.Product;
 import com.storage.mywarehouse.Hibernate.NewHibernateUtil;
 import java.awt.Component;
 import java.util.List;
 import javax.swing.JOptionPane;
 import org.hibernate.Session;
 import org.hibernate.Transaction;
+import org.hibernate.criterion.Order;
 
 /**
  *
@@ -199,15 +201,16 @@ public class clientForm extends javax.swing.JFrame {
 
         if (!update) {
             tx = session.beginTransaction();
-            List customerList = session.createQuery("FROM Customer c ORDER BY c.customerId DESC").list();
-
             int nextId = 0;
-            if (customerList.size() > 0) {
-                Customer cLast = (Customer) customerList.get(0);
-                nextId = cLast.getCustomerId() + 1;
-            }
+            
+            Customer customerWithHighestId = (Customer) session.createCriteria(Customer.class).addOrder(Order.desc("customerId")).setMaxResults(1).uniqueResult();
             tx.commit();
-
+            if (customerWithHighestId == null) {
+                nextId = 0;
+            } else {
+                nextId = customerWithHighestId.getCustomerId() + 1;
+            }
+            
             customer.setCustomerId(nextId);
         }
 

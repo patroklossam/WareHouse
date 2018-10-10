@@ -7,6 +7,7 @@
 package com.storage.mywarehouse;
 
 import com.storage.mywarehouse.Entity.Customer;
+import com.storage.mywarehouse.Entity.Product;
 import com.storage.mywarehouse.Entity.Warehouse;
 import com.storage.mywarehouse.Hibernate.NewHibernateUtil;
 import com.storage.mywarehouse.View.WarehouseProduct;
@@ -45,6 +46,7 @@ import org.apache.commons.collections.primitives.ArrayDoubleList;
 import org.apache.commons.collections.primitives.DoubleList;
 import org.hibernate.Session;
 import org.hibernate.Transaction;
+import org.hibernate.criterion.Restrictions;
 
 /**
  *
@@ -101,8 +103,8 @@ public final class mainframe extends javax.swing.JFrame implements Observer {
 
         Transaction tx = session.beginTransaction();
 
-        customers = session.createQuery("FROM Customer").list();
-
+        customers = session.createCriteria(Customer.class).list();
+       
         tx.commit();
         session.close();
 
@@ -183,8 +185,8 @@ public final class mainframe extends javax.swing.JFrame implements Observer {
         Session session = NewHibernateUtil.getSessionFactory().openSession();
         Transaction tx = session.beginTransaction();
 
-        List warehouseList = session.createQuery("FROM Warehouse").list();
-
+        List warehouseList = session.createCriteria(Warehouse.class).list();
+       
         if (warehouseList.isEmpty()) {
             JOptionPane.showMessageDialog(this, "No previous configuration found. The program will initiate in a clean state.");
         }
@@ -232,8 +234,8 @@ public final class mainframe extends javax.swing.JFrame implements Observer {
         Session session = NewHibernateUtil.getSessionFactory().openSession();
         Transaction tx = session.beginTransaction();
 
-        reporterProductList = session.createQuery("FROM WarehouseProduct WP WHERE quantity = 0").list();
-
+        reporterProductList = session.createCriteria(WarehouseProduct.class).add(Restrictions.eq("quantity", 0)).list();
+       
         tx.commit();
         session.close();
 
@@ -659,17 +661,16 @@ public final class mainframe extends javax.swing.JFrame implements Observer {
             Transaction tx = session.beginTransaction();
 
             if (param.equalsIgnoreCase("code")) {
-                productList = session.createQuery("FROM WarehouseProduct WP WHERE WP.productId = :search_code").setString("search_code", search_code).list();
+                productList = session.createCriteria(WarehouseProduct.class).add(Restrictions.eq("productId", Integer.parseInt(search_code))).list();
             } else {
                 String equality = "";
                 if (matchBox.isSelected()) {
-                    equality = " = ";
+                    productList = session.createCriteria(WarehouseProduct.class).add(Restrictions.eq(param.toLowerCase(), search_code)).list();
                 } else {
-                    equality = " LIKE ";
                     search_code = "%" + search_code + "%";
+                    productList = session.createCriteria(WarehouseProduct.class).add(Restrictions.like(param.toLowerCase(), search_code)).list();
+                     
                 }
-
-                productList = session.createQuery("FROM WarehouseProduct WP WHERE WP." + param.toLowerCase() + equality + " :search_code").setString("search_code", search_code).list();
             }
 
             for (Iterator it = productList.iterator(); it.hasNext();) {

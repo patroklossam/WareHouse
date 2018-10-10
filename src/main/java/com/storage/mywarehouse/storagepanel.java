@@ -24,6 +24,8 @@ import org.apache.commons.collections.primitives.ArrayIntList;
 import org.apache.commons.collections.primitives.IntList;
 import org.hibernate.Session;
 import org.hibernate.Transaction;
+import org.hibernate.criterion.Order;
+import org.hibernate.criterion.Restrictions;
 
 /**
  *
@@ -145,10 +147,9 @@ public class storagepanel extends javax.swing.JPanel {
         Session session = NewHibernateUtil.getSessionFactory().openSession();
         Transaction tx = session.beginTransaction();
 
-        rows = session.createQuery("FROM WarehouseEntry E where E.warehouseId = :st_id").setInteger("st_id", st_id).list();
+        rows = session.createCriteria(WarehouseEntry.class).add(Restrictions.eq("warehouseId", st_id)).list();
 
-        rows_entry = session.createQuery("FROM Entry E where E.warehouseId = :st_id").setInteger("st_id", st_id).list();
-
+        rows_entry = session.createCriteria(Entry.class).add(Restrictions.eq("warehouseId", st_id)).list();
         jTable1.setModel(tableModel);
         for (Iterator it = rows.iterator(); it.hasNext();) {
             WarehouseEntry we = (WarehouseEntry) it.next();
@@ -267,7 +268,7 @@ public class storagepanel extends javax.swing.JPanel {
         Session session = NewHibernateUtil.getSessionFactory().openSession();
         Transaction tx = session.beginTransaction();
 
-        List products = session.createQuery("FROM Product").list();
+        List products = session.createCriteria(Product.class).list();
         Product prod = null;
         String[] prodArray = new String[products.size()];
         int i = 0;
@@ -289,13 +290,12 @@ public class storagepanel extends javax.swing.JPanel {
 
         int prodId = Integer.parseInt(selectedProduct.substring(selectedProduct.lastIndexOf('_') + 1));
 
-        products = session.createQuery("FROM Product p WHERE p.productId = :prodId").setInteger("prodId", prodId).list();
-
+        products = session.createCriteria(Product.class).add(Restrictions.eq("productId", prodId)).list();
         Product pr = (Product) products.get(0);
 
-        List entries = session.createQuery("FROM Entry e ORDER BY e.entryId DESC").list();
+        Entry entry = (Entry) session.createCriteria(Entry.class).addOrder(Order.desc("entryId")).setMaxResults(1).uniqueResult();
 
-        int entryId = entries.size() == 0 ? 0 : ((Entry) entries.get(0)).getEntryId() + 1;
+        int entryId = entry == null ? 0 : entry.getEntryId() + 1;
 
         Entry e = new Entry(entryId, st_id, prodId, 0);
 

@@ -12,6 +12,7 @@ import java.util.List;
 import javax.swing.JOptionPane;
 import org.hibernate.Session;
 import org.hibernate.Transaction;
+import org.hibernate.criterion.Order;
 
 /**
  *
@@ -180,18 +181,18 @@ public class ProductForm extends javax.swing.JFrame {
 
     private void jButton1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton1ActionPerformed
 
+        int nextId = 0;
         Session session = NewHibernateUtil.getSessionFactory().openSession();
 
         Transaction tx = session.beginTransaction();
-
-        List productList = session.createQuery("FROM Product p ORDER BY p.productId DESC").list();
-
-        int nextId = 0;
-        if (productList.size() > 0) {
-            Product cLast = (Product) productList.get(0);
-            nextId = cLast.getProductId()+ 1;
-        }
+        
+        Product productWithHighestId = (Product) session.createCriteria(Product.class).addOrder(Order.desc("productId")).setMaxResults(1).uniqueResult();
         tx.commit();
+        if (productWithHighestId == null) {
+            nextId = 0;
+        } else {
+            nextId = productWithHighestId.getProductId() + 1;
+        }
 
         String pBrand = "";
         String pType = "";
