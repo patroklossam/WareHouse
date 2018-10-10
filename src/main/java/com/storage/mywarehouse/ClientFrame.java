@@ -226,6 +226,7 @@ public final class ClientFrame extends javax.swing.JFrame {
             session.delete(c);
             tx.commit();
             session.close();
+            observable.changeData("refresh_clients");
         } else {
             JOptionPane.showMessageDialog(this, "First click on the row you want to delete.");
         }
