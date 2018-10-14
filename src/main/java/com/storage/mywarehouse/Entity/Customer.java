@@ -1,5 +1,5 @@
 package com.storage.mywarehouse.Entity;
-// Generated Aug 12, 2017 5:46:27 PM by Hibernate Tools 4.3.1
+// Generated Oct 14, 2018 2:26:28 PM by Hibernate Tools 4.3.1
 
 
 

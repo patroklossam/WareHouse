@@ -8,10 +8,12 @@ package com.storage.mywarehouse;
 
 import com.storage.mywarehouse.Entity.Entry;
 import com.storage.mywarehouse.Entity.Product;
+import com.storage.mywarehouse.Entity.QuantityHistory;
 import com.storage.mywarehouse.Entity.Warehouse;
 import com.storage.mywarehouse.Hibernate.NewHibernateUtil;
 import com.storage.mywarehouse.View.WarehouseEntry;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
@@ -133,7 +135,17 @@ public class storagepanel extends javax.swing.JPanel {
                 Transaction tx = session.beginTransaction();
                 e.setQuantity(Integer.parseInt(jTable1.getValueAt(rowId, 3).toString()));
                 session.update(e);
-
+                
+                QuantityHistory qh = new QuantityHistory();
+                QuantityHistory pqh = (QuantityHistory) session.createCriteria(QuantityHistory.class).addOrder(Order.desc("id")).setMaxResults(1).uniqueResult();
+                
+                qh.setId(pqh == null ? 0 : pqh.getId() + 1);
+                qh.setDate(new Date());
+                qh.setWareHouseEntryId(e.getEntryId());
+                qh.setQuantity(e.getQuantity());
+                
+                session.save(qh);
+                
                 tx.commit();
                 session.close();
             }

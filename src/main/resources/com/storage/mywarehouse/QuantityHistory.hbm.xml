@@ -1,0 +1,21 @@
+<?xml version="1.0"?>
+<!DOCTYPE hibernate-mapping PUBLIC "-//Hibernate/Hibernate Mapping DTD 3.0//EN"
+"http://www.hibernate.org/dtd/hibernate-mapping-3.0.dtd">
+<!-- Generated Oct 14, 2018 2:05:15 PM by Hibernate Tools 4.3.1 -->
+<hibernate-mapping>
+    <class name="com.storage.mywarehouse.Entity.QuantityHistory" table="QuantityHistory" optimistic-lock="version">
+        <id name="id" type="int">
+            <column name="id" />
+            <generator class="assigned" />
+        </id>
+        <property name="wareHouseEntryId" type="integer">
+            <column name="WareHouseEntryId" not-null="true" />
+        </property>
+        <property name="date" type="date">
+            <column name="Date" not-null="true" />
+        </property>
+        <property name="quantity" type="integer">
+            <column name="Quantity"/>
+        </property>
+    </class>
+</hibernate-mapping>
