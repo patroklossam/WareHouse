@@ -46,4 +46,5 @@ Contributor(s):
   <table-filter match-name="Customer"/>
   <table-filter match-name="Warehouse"/>
   <table-filter match-name="Product"/>
+  <table-filter match-name="QuantityHistory"/>
 </hibernate-reverse-engineering>
