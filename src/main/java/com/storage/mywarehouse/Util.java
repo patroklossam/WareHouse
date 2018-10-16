@@ -8,11 +8,16 @@ package com.storage.mywarehouse;
 import com.storage.mywarehouse.Entity.Product;
 import com.storage.mywarehouse.Entity.Warehouse;
 import com.storage.mywarehouse.Hibernate.NewHibernateUtil;
+import com.storage.mywarehouse.View.QuantityHistoryView;
 import java.io.File;
+import java.io.FileWriter;
 import java.io.IOException;
+import java.io.PrintWriter;
 import java.nio.charset.StandardCharsets;
 import java.util.List;
 import java.util.Map;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import org.apache.commons.csv.CSVFormat;
 import org.apache.commons.csv.CSVParser;
 import org.apache.commons.csv.CSVRecord;
@@ -99,6 +104,31 @@ public class Util {
         }
         session.close();
         return "Number of successfully inserted rows: " + numberOfSuccessfulRows + "\n Number of erronous rows: " + numberOfFailedRows;
+    }
+    
+    public static void exportQuantityHistory(File file){
+        PrintWriter out = null;
+            try {
+                Session session = NewHibernateUtil.getSessionFactory().openSession();
+                List q_history = session.createCriteria(QuantityHistoryView.class)
+                        .addOrder(Order.asc("warehouse"))
+                        .addOrder(Order.asc("brand"))
+                        .addOrder(Order.asc("type"))
+                        .addOrder(Order.asc("date"))
+                        .list();
+                session.close();
+                out = new PrintWriter(new FileWriter(file));
+                out.println("Warehouse\tBrand\tType\tDate\tQuantity");
+//                out.println("test");
+                for(QuantityHistoryView qhv : (List<QuantityHistoryView> )q_history){
+                    out.println(qhv.toString());
+                }
+//                out.close();
+            } catch (IOException ex) {
+                Logger.getLogger(mainframe.class.getName()).log(Level.SEVERE, null, ex);
+            } finally {
+                out.close();
+            }
     }
 
     public static int addWarehouse(Session session, String name, mainframe frame) {

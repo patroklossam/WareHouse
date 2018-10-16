@@ -7,9 +7,9 @@
 package com.storage.mywarehouse;
 
 import com.storage.mywarehouse.Entity.Customer;
-import com.storage.mywarehouse.Entity.Product;
 import com.storage.mywarehouse.Entity.Warehouse;
 import com.storage.mywarehouse.Hibernate.NewHibernateUtil;
+import com.storage.mywarehouse.View.QuantityHistoryView;
 import com.storage.mywarehouse.View.WarehouseProduct;
 import java.awt.Component;
 import java.awt.Dimension;
@@ -21,7 +21,10 @@ import java.awt.event.KeyAdapter;
 import java.awt.event.KeyEvent;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
+import java.io.File;
+import java.io.FileWriter;
 import java.io.IOException;
+import java.io.PrintWriter;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
@@ -46,6 +49,7 @@ import org.apache.commons.collections.primitives.ArrayDoubleList;
 import org.apache.commons.collections.primitives.DoubleList;
 import org.hibernate.Session;
 import org.hibernate.Transaction;
+import org.hibernate.criterion.Order;
 import org.hibernate.criterion.Restrictions;
 
 /**
@@ -104,7 +108,7 @@ public final class mainframe extends javax.swing.JFrame implements Observer {
         Transaction tx = session.beginTransaction();
 
         customers = session.createCriteria(Customer.class).list();
-       
+
         tx.commit();
         session.close();
 
@@ -186,7 +190,7 @@ public final class mainframe extends javax.swing.JFrame implements Observer {
         Transaction tx = session.beginTransaction();
 
         List warehouseList = session.createCriteria(Warehouse.class).list();
-       
+
         if (warehouseList.isEmpty()) {
             JOptionPane.showMessageDialog(this, "No previous configuration found. The program will initiate in a clean state.");
         }
@@ -235,7 +239,7 @@ public final class mainframe extends javax.swing.JFrame implements Observer {
         Transaction tx = session.beginTransaction();
 
         reporterProductList = session.createCriteria(WarehouseProduct.class).add(Restrictions.eq("quantity", 0)).list();
-       
+
         tx.commit();
         session.close();
 
@@ -277,6 +281,8 @@ public final class mainframe extends javax.swing.JFrame implements Observer {
         reporter = new javax.swing.JTable();
         jMenuBar1 = new javax.swing.JMenuBar();
         jMenu1 = new javax.swing.JMenu();
+        jMenu7 = new javax.swing.JMenu();
+        jMenuItem7 = new javax.swing.JMenuItem();
         close = new javax.swing.JMenuItem();
         jMenu2 = new javax.swing.JMenu();
         jMenu4 = new javax.swing.JMenu();
@@ -520,6 +526,18 @@ public final class mainframe extends javax.swing.JFrame implements Observer {
 
         jMenu1.setText("File");
 
+        jMenu7.setText("Export");
+
+        jMenuItem7.setText("Quantity history");
+        jMenuItem7.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jMenuItem7ActionPerformed(evt);
+            }
+        });
+        jMenu7.add(jMenuItem7);
+
+        jMenu1.add(jMenu7);
+
         close.setText("Exit");
         close.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
@@ -669,7 +687,7 @@ public final class mainframe extends javax.swing.JFrame implements Observer {
                 } else {
                     search_code = "%" + search_code + "%";
                     productList = session.createCriteria(WarehouseProduct.class).add(Restrictions.like(param.toLowerCase(), search_code)).list();
-                     
+
                 }
             }
 
@@ -763,8 +781,8 @@ public final class mainframe extends javax.swing.JFrame implements Observer {
 
     private void jMenuItem6ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jMenuItem6ActionPerformed
         JFileChooser jfc = new JFileChooser();
-        FileNameExtensionFilter typeFilter = new FileNameExtensionFilter("CSV file", ".csv");
-        jfc.setFileFilter(typeFilter);
+        FileNameExtensionFilter typeFilter = new FileNameExtensionFilter("CSV file", "csv");
+        jfc.addChoosableFileFilter(typeFilter);
         int returnValue = jfc.showOpenDialog(null);
         if (returnValue == JFileChooser.APPROVE_OPTION) {
             try {
@@ -775,6 +793,15 @@ public final class mainframe extends javax.swing.JFrame implements Observer {
             }
         }
     }//GEN-LAST:event_jMenuItem6ActionPerformed
+
+    private void jMenuItem7ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jMenuItem7ActionPerformed
+        JFileChooser fileChooser = new JFileChooser();
+        fileChooser.setCurrentDirectory(new File("~/Desktop/"));
+        if (fileChooser.showSaveDialog(null) == JFileChooser.APPROVE_OPTION) {
+            Util.exportQuantityHistory(fileChooser.getSelectedFile());
+        }
+
+    }//GEN-LAST:event_jMenuItem7ActionPerformed
 
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
@@ -792,6 +819,7 @@ public final class mainframe extends javax.swing.JFrame implements Observer {
     private javax.swing.JMenu jMenu4;
     private javax.swing.JMenu jMenu5;
     private javax.swing.JMenu jMenu6;
+    private javax.swing.JMenu jMenu7;
     private javax.swing.JMenuBar jMenuBar1;
     private javax.swing.JMenuItem jMenuItem1;
     private javax.swing.JMenuItem jMenuItem2;
@@ -799,6 +827,7 @@ public final class mainframe extends javax.swing.JFrame implements Observer {
     private javax.swing.JMenuItem jMenuItem4;
     private javax.swing.JMenuItem jMenuItem5;
     private javax.swing.JMenuItem jMenuItem6;
+    private javax.swing.JMenuItem jMenuItem7;
     private javax.swing.JPanel jPanel1;
     private javax.swing.JPanel jPanel2;
     private javax.swing.JScrollPane jScrollPane1;
