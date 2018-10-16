@@ -1,1 +1,5 @@
 /target/
+
+# Intellij
+.idea/
+MyWareHouse.iml
