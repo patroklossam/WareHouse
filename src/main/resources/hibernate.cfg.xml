@@ -52,5 +52,6 @@ Contributor(s):
     <mapping resource="com/storage/mywarehouse/WarehouseProduct.hbm.xml"/>
     <mapping resource="com/storage/mywarehouse/WarehouseEntry.hbm.xml"/>
     <mapping resource="com/storage/mywarehouse/QuantityHistory.hbm.xml"/>
+    <mapping resource="com/storage/mywarehouse/QuantityHistoryView.hbm.xml"/>
   </session-factory>
 </hibernate-configuration>
