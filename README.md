@@ -24,6 +24,11 @@ This is an open-source warehouse management system.
 * Netbeans and java 8
 * SQLite studio
 
+## Testing
+* This project uses [JUnit 5](https://junit.org/junit5/)
+* In order to run the tests, you must have [Maven](https://maven.apache.org/) installed
+* Run the tests by running `mvn test` from the command-line.
+
 # Important
 * **Do not forget** to commit also the maven dependencies file if you add new dependencies!
 * **Never commit** changes to the storage.db file, nor changes to the application main password
