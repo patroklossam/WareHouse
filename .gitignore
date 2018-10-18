@@ -1,4 +1,5 @@
 /target/
+/nbproject/
 
 # Intellij
 .idea/
