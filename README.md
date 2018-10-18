@@ -1,4 +1,5 @@
 [![Build Status](https://travis-ci.org/patroklossam/WareHouse.svg?branch=master)](https://travis-ci.org/patroklossam/WareHouse)
+[![Coverage Status](https://coveralls.io/repos/github/patroklossam/WareHouse/badge.svg?branch=master)](https://coveralls.io/github/patroklossam/WareHouse?branch=master)
 
 # WareHouse
 This is an open-source warehouse management system.
