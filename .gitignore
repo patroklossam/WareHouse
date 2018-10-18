@@ -1,2 +1,6 @@
 /target/
 /nbproject/
+
+# Intellij
+.idea/
+MyWareHouse.iml

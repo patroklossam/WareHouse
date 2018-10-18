@@ -3,7 +3,7 @@
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
  */
-package imports;
+package com.storage.mywarehouse;
 
 import com.storage.mywarehouse.Entity.Product;
 import com.storage.mywarehouse.Hibernate.NewHibernateUtil;
@@ -27,11 +27,11 @@ import static org.junit.Assert.*;
  *
  * @author veruz
  */
-public class ImportProductsFromCsvTest {
+public class UtilsImportProductsFromCsvTest {
 
     private Session session = null;
     private File file = null;
-    public ImportProductsFromCsvTest() {
+    public UtilsImportProductsFromCsvTest() {
     }
     
     @BeforeClass
