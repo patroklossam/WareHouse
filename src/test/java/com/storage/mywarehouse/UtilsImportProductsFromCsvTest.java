@@ -5,30 +5,24 @@
  */
 package com.storage.mywarehouse;
 
-import com.storage.mywarehouse.Entity.Product;
-import com.storage.mywarehouse.Hibernate.NewHibernateUtil;
-import com.storage.mywarehouse.Util;
+import static org.junit.Assert.assertEquals;
+
 import java.io.File;
 import java.io.IOException;
-import java.io.InputStream;
 import java.util.List;
-import javax.transaction.Transactional;
+
 import org.hibernate.Session;
-import org.hibernate.SessionFactory;
 import org.hibernate.Transaction;
 import org.hibernate.criterion.MatchMode;
 import org.hibernate.criterion.Restrictions;
-import org.junit.After;
-import org.junit.AfterClass;
-import org.junit.Before;
-import org.junit.BeforeClass;
 import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
-import static org.junit.Assert.*;
+import com.storage.mywarehouse.Entity.Product;
+import com.storage.mywarehouse.Hibernate.NewHibernateUtil;
 
 /**
  *
@@ -51,7 +45,7 @@ public class UtilsImportProductsFromCsvTest {
     
     @BeforeEach
     public void setUp() {
-        file = new File("./products.csv");//src/test/resources/products.csv
+        file = new File("src/test/resources/products.csv");
         session = NewHibernateUtil.getSessionFactory().openSession();
     }
     
@@ -66,7 +60,8 @@ public class UtilsImportProductsFromCsvTest {
     
     @Test
     public void testExistense(){
-    List<Product> products = session.createCriteria(Product.class)
+    @SuppressWarnings("unchecked")
+	List<Product> products = session.createCriteria(Product.class)
                 .add(Restrictions.and(Restrictions.eq("brand", "unit"),Restrictions.like("type", "test", MatchMode.START))).list();
         
         assertEquals(0, products.size());
@@ -74,9 +69,8 @@ public class UtilsImportProductsFromCsvTest {
     
     @Test
     public void testParseProducts() throws IOException{
-        
         Util.parseProducts(file);
-        
+        @SuppressWarnings("unchecked")
         List<Product> products = session.createCriteria(Product.class)
                 .add(Restrictions.and(Restrictions.eq("brand", "unit"),Restrictions.like("type", "test", MatchMode.START))).list();
         
@@ -85,6 +79,7 @@ public class UtilsImportProductsFromCsvTest {
     }
     
     private void deleteTestEntries(){
+    	@SuppressWarnings("unchecked")
         List<Product> products = session.createCriteria(Product.class)
                 .add(Restrictions.and(Restrictions.eq("brand", "unit"),Restrictions.like("type", "test", MatchMode.START))).list();
         
