@@ -5,23 +5,24 @@
  */
 package com.storage.mywarehouse;
 
-import com.storage.mywarehouse.Entity.Product;
-import com.storage.mywarehouse.Hibernate.NewHibernateUtil;
-import com.storage.mywarehouse.Util;
+import static org.junit.Assert.assertEquals;
+
 import java.io.File;
 import java.io.IOException;
 import java.util.List;
-import javax.transaction.Transactional;
+
 import org.hibernate.Session;
-import org.hibernate.SessionFactory;
+import org.hibernate.Transaction;
 import org.hibernate.criterion.MatchMode;
 import org.hibernate.criterion.Restrictions;
-import org.junit.After;
-import org.junit.AfterClass;
-import org.junit.Before;
-import org.junit.BeforeClass;
-import org.junit.Test;
-import static org.junit.Assert.*;
+import org.junit.jupiter.api.AfterAll;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+
+import com.storage.mywarehouse.Entity.Product;
+import com.storage.mywarehouse.Hibernate.NewHibernateUtil;
 
 /**
  *
@@ -34,24 +35,21 @@ public class UtilsImportProductsFromCsvTest {
     public UtilsImportProductsFromCsvTest() {
     }
     
-    @BeforeClass
+    @BeforeAll
     public static void setUpClass() {
     }
     
-    @AfterClass
+    @AfterAll
     public static void tearDownClass() {
     }
     
-    @Before
+    @BeforeEach
     public void setUp() {
-        ClassLoader classLoader = getClass().getClassLoader();
-        
         file = new File("src/test/resources/products.csv");
-//        file = new File(classLoader.getResource("products.csv").getFile());
         session = NewHibernateUtil.getSessionFactory().openSession();
     }
     
-    @After
+    @AfterEach
     public void tearDown() {
         file = null;
         
@@ -59,25 +57,11 @@ public class UtilsImportProductsFromCsvTest {
         session.close();
     }
 
-    // TODO add test methods here.
-    // The methods must be annotated with annotation @Test. For example:
-    //
-    // @Test
-    // public void hello() {}
-    
-    private void deleteTestEntries(){
-        List products = session.createCriteria(Product.class)
-                .add(Restrictions.and(Restrictions.eq("brand", "unit"),Restrictions.like("type", "test", MatchMode.START))).list();
-        
-        for(Product p : (List<Product>) products){
-            session.delete(p);
-            
-        }
-    }
     
     @Test
     public void testExistense(){
-    List products = session.createCriteria(Product.class)
+    @SuppressWarnings("unchecked")
+	List<Product> products = session.createCriteria(Product.class)
                 .add(Restrictions.and(Restrictions.eq("brand", "unit"),Restrictions.like("type", "test", MatchMode.START))).list();
         
         assertEquals(0, products.size());
@@ -85,13 +69,24 @@ public class UtilsImportProductsFromCsvTest {
     
     @Test
     public void testParseProducts() throws IOException{
-        
         Util.parseProducts(file);
-        
-        List products = session.createCriteria(Product.class)
+        @SuppressWarnings("unchecked")
+        List<Product> products = session.createCriteria(Product.class)
                 .add(Restrictions.and(Restrictions.eq("brand", "unit"),Restrictions.like("type", "test", MatchMode.START))).list();
-        assertNotNull(products);
+        
         assertEquals(2, products.size());
         
+    }
+    
+    private void deleteTestEntries(){
+    	@SuppressWarnings("unchecked")
+        List<Product> products = session.createCriteria(Product.class)
+                .add(Restrictions.and(Restrictions.eq("brand", "unit"),Restrictions.like("type", "test", MatchMode.START))).list();
+        
+        Transaction transaction = session.beginTransaction();
+        for(Product p : products){
+            session.delete(p);
+        }
+        transaction.commit();
     }
 }
