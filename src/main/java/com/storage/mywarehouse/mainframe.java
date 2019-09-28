@@ -103,17 +103,10 @@ public final class mainframe extends javax.swing.JFrame implements Observer {
         customer_dc.add(0.0);
         clientCombo.addItem("Select Customer");
 
-        Session session = NewHibernateUtil.getSessionFactory().openSession();
-
-        Transaction tx = session.beginTransaction();
-
-        customers = session.createCriteria(Customer.class).list();
-
-        tx.commit();
-        session.close();
+        this.customers = findAllCustomers();
 
         if (Globals.ClientsFrame) {
-            clframe.refreshClients(customers);
+            clframe.refreshClients(this.customers);
         }
 
         clientCombo.removeAllItems();
@@ -121,12 +114,21 @@ public final class mainframe extends javax.swing.JFrame implements Observer {
         customer_dc.add(0.0);
         clientCombo.addItem("Customer Selection");
 
-        for (Iterator it = customers.iterator(); it.hasNext();) {
+        for (Iterator it = this.customers.iterator(); it.hasNext();) {
             Customer cust = (Customer) it.next();
             customer_dc.add(cust.getDiscount());
             clientCombo.addItem(cust.getLastName() + " - " + cust.getName());
         }
 
+    }
+
+    private List findAllCustomers() {
+        Session session = NewHibernateUtil.getSessionFactory().openSession();
+        Transaction tx = session.beginTransaction();
+        List customers = session.createCriteria(Customer.class).list();
+        tx.commit();
+        session.close();
+        return customers;
     }
 
     public mainframe() {
@@ -186,10 +188,7 @@ public final class mainframe extends javax.swing.JFrame implements Observer {
         tab.addChangeListener(l);
         tab.addMouseListener(l);
 
-        Session session = NewHibernateUtil.getSessionFactory().openSession();
-        Transaction tx = session.beginTransaction();
-
-        List warehouseList = session.createCriteria(Warehouse.class).list();
+        List warehouseList = findAllWarehouse();
 
         if (warehouseList.isEmpty()) {
             JOptionPane.showMessageDialog(this, "No previous configuration found. The program will initiate in a clean state.");
@@ -204,15 +203,21 @@ public final class mainframe extends javax.swing.JFrame implements Observer {
             tab.add(w.getName(), panels.get(panels.size() - 1));
         }
 
-        tx.commit();
-        session.close();
-
         fillInReporter();
 
         //load customers
         refreshCustomers();
 
         setLocationRelativeTo(null);
+    }
+
+    private List findAllWarehouse() {
+        Session session = NewHibernateUtil.getSessionFactory().openSession();
+        Transaction tx = session.beginTransaction();
+        List warehouseList = session.createCriteria(Warehouse.class).list();
+        tx.commit();
+        session.close();
+        return warehouseList;
     }
 
     private void cleanEmptyUntitledTabs() {
@@ -235,13 +240,9 @@ public final class mainframe extends javax.swing.JFrame implements Observer {
             tableModel_rep.removeRow(0);
         }
 
-        Session session = NewHibernateUtil.getSessionFactory().openSession();
-        Transaction tx = session.beginTransaction();
+        int quantity = 0;
 
-        reporterProductList = session.createCriteria(WarehouseProduct.class).add(Restrictions.eq("quantity", 0)).list();
-
-        tx.commit();
-        session.close();
+        reporterProductList = findWarehouseProductByQuantity(quantity);
 
         // fill in table with zero quantities
         for (Iterator it = reporterProductList.iterator(); it.hasNext();) {
@@ -251,6 +252,15 @@ public final class mainframe extends javax.swing.JFrame implements Observer {
 
         }
 
+    }
+
+    private List findWarehouseProductByQuantity(int quantity) {
+        Session session = NewHibernateUtil.getSessionFactory().openSession();
+        Transaction tx = session.beginTransaction();
+        List emptyWarehouseProduct = session.createCriteria(WarehouseProduct.class).add(Restrictions.eq("quantity", quantity)).list();
+        tx.commit();
+        session.close();
+        return emptyWarehouseProduct;
     }
 
     /**
@@ -645,13 +655,13 @@ public final class mainframe extends javax.swing.JFrame implements Observer {
 
             Session session = NewHibernateUtil.getSessionFactory().openSession();
             int retcode = Util.addWarehouse(session, name, this);
+            session.close();
 
             if (retcode < 0) {
                 JOptionPane.showMessageDialog(null, "Warehouse exists!");
             } else {
                 JOptionPane.showMessageDialog(null, "Successfully added new warehouse.");
             }
-            session.close();
         }
     }//GEN-LAST:event_jMenuItem1ActionPerformed
 
