@@ -6,47 +6,30 @@
  */
 package com.storage.mywarehouse;
 
+import com.storage.mywarehouse.Dao.WarehouseDAO;
 import com.storage.mywarehouse.Entity.Customer;
 import com.storage.mywarehouse.Entity.Warehouse;
 import com.storage.mywarehouse.Hibernate.NewHibernateUtil;
 import com.storage.mywarehouse.View.WarehouseProduct;
-import java.awt.Component;
-import java.awt.Dimension;
-import java.awt.Rectangle;
-import java.awt.event.ActionEvent;
-import java.awt.event.FocusAdapter;
-import java.awt.event.FocusEvent;
-import java.awt.event.KeyAdapter;
-import java.awt.event.KeyEvent;
-import java.awt.event.MouseAdapter;
-import java.awt.event.MouseEvent;
-import java.io.File;
-import java.io.IOException;
-import java.util.ArrayList;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Observable;
-import java.util.Observer;
-import java.util.logging.Level;
-import java.util.logging.Logger;
-import javax.swing.AbstractAction;
-import javax.swing.BorderFactory;
-import javax.swing.JComponent;
-import javax.swing.JFileChooser;
-import javax.swing.JOptionPane;
-import javax.swing.JTabbedPane;
-import javax.swing.JTable;
-import javax.swing.JTextField;
-import javax.swing.KeyStroke;
-import javax.swing.event.ChangeEvent;
-import javax.swing.event.ChangeListener;
-import javax.swing.filechooser.FileNameExtensionFilter;
-import javax.swing.table.DefaultTableModel;
 import org.apache.commons.collections.primitives.ArrayDoubleList;
 import org.apache.commons.collections.primitives.DoubleList;
 import org.hibernate.Session;
 import org.hibernate.Transaction;
 import org.hibernate.criterion.Restrictions;
+
+import javax.swing.*;
+import javax.swing.event.ChangeEvent;
+import javax.swing.event.ChangeListener;
+import javax.swing.filechooser.FileNameExtensionFilter;
+import javax.swing.table.DefaultTableModel;
+import java.awt.*;
+import java.awt.event.*;
+import java.io.File;
+import java.io.IOException;
+import java.util.List;
+import java.util.*;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 /**
  *
@@ -184,15 +167,13 @@ public final class mainframe extends javax.swing.JFrame implements Observer {
         tab.addChangeListener(l);
         tab.addMouseListener(l);
 
-        List warehouseList = findAllWarehouse();
+        List<Warehouse> warehouses = WarehouseDAO.findAll();
 
-        if (warehouseList.isEmpty()) {
+        if (warehouses.isEmpty()) {
             JOptionPane.showMessageDialog(this, "No previous configuration found. The program will initiate in a clean state.");
         }
 
-        for (Iterator it = warehouseList.iterator(); it.hasNext();) {
-            Warehouse w = (Warehouse) it.next();
-
+        for (Warehouse w : warehouses) {
             panels.add(new storagepanel(w, this));
             panels.get(panels.size() - 1).Load();
 
@@ -205,15 +186,6 @@ public final class mainframe extends javax.swing.JFrame implements Observer {
         refreshCustomers();
 
         setLocationRelativeTo(null);
-    }
-
-    private List findAllWarehouse() {
-        Session session = NewHibernateUtil.getSessionFactory().openSession();
-        Transaction tx = session.beginTransaction();
-        List warehouseList = session.createCriteria(Warehouse.class).list();
-        tx.commit();
-        session.close();
-        return warehouseList;
     }
 
     private void cleanEmptyUntitledTabs() {

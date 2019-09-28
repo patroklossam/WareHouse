@@ -6,10 +6,22 @@ import org.hibernate.Session;
 import org.hibernate.Transaction;
 import org.hibernate.criterion.Order;
 
+import java.util.List;
+
 import static org.hibernate.criterion.Restrictions.and;
 import static org.hibernate.criterion.Restrictions.eq;
 
 public class WarehouseDAO {
+    @SuppressWarnings("unchecked")
+    public static List<Warehouse> findAll() {
+        Session session = NewHibernateUtil.getSessionFactory().openSession();
+        Transaction tx = session.beginTransaction();
+        List warehouseList = session.createCriteria(Warehouse.class).list();
+        tx.commit();
+        session.close();
+        return warehouseList;
+    }
+
     public static Warehouse findByName(String name) {
         Session session = NewHibernateUtil.getSessionFactory().openSession();
         Transaction transaction = session.beginTransaction();
