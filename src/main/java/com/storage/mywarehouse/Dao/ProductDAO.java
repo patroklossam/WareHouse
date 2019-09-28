@@ -59,7 +59,7 @@ public class ProductDAO {
         return existingProduct;
     }
 
-    public static Product saveWith(String brand, String type, String description, double price) {
+    public static Product save(Product product) {
         int productId;
         Session session = NewHibernateUtil.getSessionFactory().openSession();
         Transaction transaction = session.beginTransaction();
@@ -73,12 +73,12 @@ public class ProductDAO {
         } else {
             productId = productWithHighestId.getProductId() + 1;
         }
-        Product p = new Product(productId, brand, type, description, price);
+        product.setProductId(productId);
         transaction = session.beginTransaction();
-        session.save(p);
+        session.save(product);
         transaction.commit();
         session.close();
-        return p;
+        return product;
     }
 
     public static void deleteAll(List<Product> products) {

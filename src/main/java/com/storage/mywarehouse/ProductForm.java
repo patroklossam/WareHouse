@@ -6,6 +6,7 @@
 package com.storage.mywarehouse;
 
 import com.storage.mywarehouse.Dao.ProductDAO;
+import com.storage.mywarehouse.Entity.Product;
 
 import javax.swing.*;
 import java.awt.*;
@@ -197,7 +198,8 @@ public class ProductForm extends javax.swing.JFrame {
             pPrice = 0.0;
         }
 
-        ProductDAO.saveWith(pBrand, pType, pDesc, pPrice);
+        Product product = new Product(pBrand, pType, pDesc, pPrice);
+        ProductDAO.save(product);
 
         JOptionPane.showMessageDialog((Component) null, "New Product saved");
 

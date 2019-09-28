@@ -67,7 +67,8 @@ public class Util {
 
         String description = record.get(ProductHeader.DESCRIPTION);
         double price = Double.parseDouble(record.get(ProductHeader.PRICE));
-        return ProductDAO.saveWith(brand, type, description, price);
+        Product product = new Product(brand, type, description, price);
+        return ProductDAO.save(product);
     }
 
     public static String parseWarehouses(File file, mainframe frame) throws IOException {
