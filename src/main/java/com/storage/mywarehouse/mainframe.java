@@ -9,7 +9,6 @@ package com.storage.mywarehouse;
 import com.storage.mywarehouse.Entity.Customer;
 import com.storage.mywarehouse.Entity.Warehouse;
 import com.storage.mywarehouse.Hibernate.NewHibernateUtil;
-import com.storage.mywarehouse.View.QuantityHistoryView;
 import com.storage.mywarehouse.View.WarehouseProduct;
 import java.awt.Component;
 import java.awt.Dimension;
@@ -22,9 +21,7 @@ import java.awt.event.KeyEvent;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.io.File;
-import java.io.FileWriter;
 import java.io.IOException;
-import java.io.PrintWriter;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
@@ -49,7 +46,6 @@ import org.apache.commons.collections.primitives.ArrayDoubleList;
 import org.apache.commons.collections.primitives.DoubleList;
 import org.hibernate.Session;
 import org.hibernate.Transaction;
-import org.hibernate.criterion.Order;
 import org.hibernate.criterion.Restrictions;
 
 /**
@@ -654,7 +650,7 @@ public final class mainframe extends javax.swing.JFrame implements Observer {
         if (name != null) {
 
             Session session = NewHibernateUtil.getSessionFactory().openSession();
-            int retcode = Util.addWarehouse(session, name, this);
+            int retcode = Util.addWarehouse(name, this);
             session.close();
 
             if (retcode < 0) {

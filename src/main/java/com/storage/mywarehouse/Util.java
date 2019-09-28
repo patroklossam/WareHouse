@@ -87,7 +87,6 @@ public class Util {
         Map<String, Integer> header = csvParser.getHeaderMap();
         int numberOfSuccessfulRows = 0;
         int numberOfFailedRows = 0;
-        Session session = NewHibernateUtil.getSessionFactory().openSession();
         for (CSVRecord record : csvParser.getRecords()) {
             String name = record.get(WarehouseHeader.NAME);
             if ("".equals(name)) {
@@ -95,14 +94,13 @@ public class Util {
                 continue;
             }
 
-            if (addWarehouse(session, name, frame) < 0) {
+            if (addWarehouse(name, frame) < 0) {
                 numberOfFailedRows++;
             } else {
                 numberOfSuccessfulRows++;
             }
 
         }
-        session.close();
         return "Number of successfully inserted rows: " + numberOfSuccessfulRows + "\n Number of erronous rows: " + numberOfFailedRows;
     }
     
@@ -131,10 +129,13 @@ public class Util {
             }
     }
 
-    public static int addWarehouse(Session session, String name, mainframe frame) {
-        List<storagepanel> panels = frame.getPanels();
+    public static int addWarehouse(String name, mainframe frame) {
+        Session session = NewHibernateUtil.getSessionFactory().openSession();
         Transaction tx = session.beginTransaction();
-        Warehouse existingWarehouse = (Warehouse) session.createCriteria(Warehouse.class).add(Restrictions.and(Restrictions.eq("name", name))).uniqueResult();
+        Warehouse existingWarehouse = (Warehouse) session.createCriteria(Warehouse.class)
+                .add(Restrictions.and(
+                        Restrictions.eq("name", name)
+                )).uniqueResult();
         tx.commit();
         if (existingWarehouse != null) {
             System.out.println("Warehouse " + name + " already exists!");
@@ -142,7 +143,10 @@ public class Util {
         }
         tx = session.beginTransaction();
         int warehouseId;
-        Warehouse withHighestId = (Warehouse) session.createCriteria(Warehouse.class).addOrder(Order.desc("warehouseId")).setMaxResults(1).uniqueResult();
+        Warehouse withHighestId = (Warehouse) session.createCriteria(Warehouse.class)
+                .addOrder(Order.desc("warehouseId"))
+                .setMaxResults(1)
+                .uniqueResult();
         tx.commit();
         if (withHighestId == null) {
             warehouseId = 0;
@@ -154,7 +158,9 @@ public class Util {
 
         session.save(w);
         tx.commit();
+        session.close();
 
+        List<storagepanel> panels = frame.getPanels();
         panels.add(new storagepanel(w, frame));
         frame.getWarehouses().add(w);
         frame.getTabs().add(name, panels.get(panels.size() - 1));
