@@ -80,4 +80,14 @@ public class ProductDAO {
         session.close();
         return p;
     }
+
+    public static void deleteAll(List<Product> products) {
+        Session session = NewHibernateUtil.getSessionFactory().openSession();
+        Transaction transaction = session.beginTransaction();
+        for (Product p : products) {
+            session.delete(p);
+        }
+        transaction.commit();
+        session.close();
+    }
 }
