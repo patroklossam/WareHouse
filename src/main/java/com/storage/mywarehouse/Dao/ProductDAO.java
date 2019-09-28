@@ -5,13 +5,37 @@ import com.storage.mywarehouse.Hibernate.NewHibernateUtil;
 import org.hibernate.Session;
 import org.hibernate.Transaction;
 import org.hibernate.criterion.Order;
+import org.hibernate.criterion.Restrictions;
+
+import java.util.List;
 
 import static org.hibernate.criterion.Restrictions.and;
 import static org.hibernate.criterion.Restrictions.eq;
 
 public class ProductDAO {
 
-    public static Product findBy(String brand, String type) {
+    public static List findAll() {
+        Session session = NewHibernateUtil.getSessionFactory().openSession();
+        Transaction transaction = session.beginTransaction();
+        List products = session.createCriteria(Product.class).list();
+        transaction.commit();
+        session.close();
+        return products;
+    }
+
+    public static Product findById(int productId) {
+        Session session = NewHibernateUtil.getSessionFactory().openSession();
+        Transaction transaction = session.beginTransaction();
+        List products = session.createCriteria(Product.class)
+                .add(Restrictions.eq("productId", productId))
+                .list();
+        Product pr = (Product) products.get(0);
+        transaction.commit();
+        session.close();
+        return pr;
+    }
+
+    public static Product findByBrandAndName(String brand, String type) {
         Session session = NewHibernateUtil.getSessionFactory().openSession();
         Transaction transaction = session.beginTransaction();
         Product existingProduct = (Product) session.createCriteria(Product.class)

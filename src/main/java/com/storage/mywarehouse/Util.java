@@ -60,7 +60,7 @@ public class Util {
         if ("".equals(brand) || "".equals(type)) {
             return null;
         }
-        if (ProductDAO.findBy(brand, type) != null) {
+        if (ProductDAO.findByBrandAndName(brand, type) != null) {
             System.out.println("Product of brand " + brand + " and type " + type + " already exists!");
             return null;
         }

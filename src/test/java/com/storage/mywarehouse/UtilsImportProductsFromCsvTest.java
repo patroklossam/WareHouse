@@ -63,10 +63,20 @@ public class UtilsImportProductsFromCsvTest {
 		assertThat("should find 2 products, inserted from products file", products, hasSize(2));
 	}
 
+	@Test
+	public void testDeleteAll() throws IOException {
+		Util.parseProducts(file);
+		deleteTestEntries();
+		List<Product> products = readAllTestProductsFromDatabase();
+
+		assertThat("should delete all products", products, hasSize(0));
+	}
+
 	@SuppressWarnings("unchecked")
 	private List<Product> readAllTestProductsFromDatabase() {
 		return session.createCriteria(Product.class).add(
-				Restrictions.and(Restrictions.eq("brand", "unit"), Restrictions.like("type", "test", MatchMode.START)))
+				        Restrictions.and(Restrictions.eq("brand", "unit"),
+						Restrictions.like("type", "test", MatchMode.START)))
 				.list();
 	}
 
