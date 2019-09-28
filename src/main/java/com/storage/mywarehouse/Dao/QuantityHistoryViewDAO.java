@@ -9,7 +9,8 @@ import java.util.List;
 
 public class QuantityHistoryViewDAO {
 
-    public static List findAll() {
+    @SuppressWarnings("unchecked")
+    public static List<QuantityHistoryView> findAll() {
         Session session = NewHibernateUtil.getSessionFactory().openSession();
         List q_history = session.createCriteria(QuantityHistoryView.class)
                 .addOrder(Order.asc("warehouse"))

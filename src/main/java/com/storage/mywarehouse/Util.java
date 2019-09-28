@@ -10,6 +10,10 @@ import com.storage.mywarehouse.Dao.QuantityHistoryViewDAO;
 import com.storage.mywarehouse.Dao.WarehouseDAO;
 import com.storage.mywarehouse.Entity.Product;
 import com.storage.mywarehouse.Entity.Warehouse;
+import com.storage.mywarehouse.View.QuantityHistoryView;
+import org.apache.commons.csv.CSVFormat;
+import org.apache.commons.csv.CSVParser;
+import org.apache.commons.csv.CSVRecord;
 
 import java.io.File;
 import java.io.FileWriter;
@@ -19,12 +23,6 @@ import java.nio.charset.StandardCharsets;
 import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-
-import org.apache.commons.csv.CSVFormat;
-import org.apache.commons.csv.CSVParser;
-import org.apache.commons.csv.CSVRecord;
-
-import static org.hibernate.criterion.Restrictions.and;
 
 /**
  * @author bojan, Patroklos
@@ -95,7 +93,7 @@ public class Util {
     public static void exportQuantityHistory(File file) {
         try (PrintWriter out = new PrintWriter(new FileWriter(file))) {
             out.println("Warehouse\tBrand\tType\tDate\tQuantity");
-            for (Object qhv : QuantityHistoryViewDAO.findAll()) {
+            for (QuantityHistoryView qhv : QuantityHistoryViewDAO.findAll()) {
                 out.println(qhv.toString());
             }
         } catch (IOException ex) {
