@@ -26,7 +26,10 @@ public class ProductDAO {
         int productId;
         Session session = NewHibernateUtil.getSessionFactory().openSession();
         Transaction transaction = session.beginTransaction();
-        Product productWithHighestId = (Product) session.createCriteria(Product.class).addOrder(Order.desc("productId")).setMaxResults(1).uniqueResult();
+        Product productWithHighestId = (Product) session.createCriteria(Product.class)
+                .addOrder(Order.desc("productId"))
+                .setMaxResults(1)
+                .uniqueResult();
         transaction.commit();
         if (productWithHighestId == null) {
             productId = 0;
