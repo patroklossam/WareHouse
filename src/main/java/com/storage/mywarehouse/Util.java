@@ -76,7 +76,6 @@ public class Util {
 
     public static String parseWarehouses(File file, mainframe frame) throws IOException {
         CSVParser csvParser = CSVParser.parse(file, StandardCharsets.UTF_8, CSVFormat.EXCEL.withHeader(WarehouseHeader.class));
-        Map<String, Integer> header = csvParser.getHeaderMap();
         int numberOfSuccessfulRows = 0;
         int numberOfFailedRows = 0;
         for (CSVRecord record : csvParser.getRecords()) {
@@ -97,28 +96,26 @@ public class Util {
     }
 
     public static void exportQuantityHistory(File file) {
-        PrintWriter out = null;
-        try {
-            Session session = NewHibernateUtil.getSessionFactory().openSession();
-            List q_history = session.createCriteria(QuantityHistoryView.class)
-                    .addOrder(Order.asc("warehouse"))
-                    .addOrder(Order.asc("brand"))
-                    .addOrder(Order.asc("type"))
-                    .addOrder(Order.asc("date"))
-                    .list();
-            session.close();
-            out = new PrintWriter(new FileWriter(file));
+        try (PrintWriter out = new PrintWriter(new FileWriter(file))) {
             out.println("Warehouse\tBrand\tType\tDate\tQuantity");
-//                out.println("test");
-            for (QuantityHistoryView qhv : (List<QuantityHistoryView>) q_history) {
+            for (Object qhv : findAllQuantityHistoryView()) {
                 out.println(qhv.toString());
             }
-//                out.close();
         } catch (IOException ex) {
             Logger.getLogger(mainframe.class.getName()).log(Level.SEVERE, null, ex);
-        } finally {
-            out.close();
         }
+    }
+
+    private static List findAllQuantityHistoryView() {
+        Session session = NewHibernateUtil.getSessionFactory().openSession();
+        List q_history = session.createCriteria(QuantityHistoryView.class)
+                .addOrder(Order.asc("warehouse"))
+                .addOrder(Order.asc("brand"))
+                .addOrder(Order.asc("type"))
+                .addOrder(Order.asc("date"))
+                .list();
+        session.close();
+        return q_history;
     }
 
     public static int addWarehouse(String name, mainframe frame) {
