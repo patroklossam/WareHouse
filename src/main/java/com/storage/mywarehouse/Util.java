@@ -130,40 +130,48 @@ public class Util {
     }
 
     public static int addWarehouse(String name, mainframe frame) {
-        Session session = NewHibernateUtil.getSessionFactory().openSession();
-        Transaction tx = session.beginTransaction();
-        Warehouse existingWarehouse = (Warehouse) session.createCriteria(Warehouse.class)
-                .add(Restrictions.and(
-                        Restrictions.eq("name", name)
-                )).uniqueResult();
-        tx.commit();
-        if (existingWarehouse != null) {
+        if (findWarehouseByName(name) != null) {
             System.out.println("Warehouse " + name + " already exists!");
             return -1;
         }
-        tx = session.beginTransaction();
+
+        Warehouse w = saveWarehouseWithName(name);
+        List<storagepanel> panels = frame.getPanels();
+        panels.add(new storagepanel(w, frame));
+        frame.getWarehouses().add(w);
+        frame.getTabs().add(name, panels.get(panels.size() - 1));
+        return 0;
+    }
+
+    private static Warehouse saveWarehouseWithName(String name) {
+        Session session = NewHibernateUtil.getSessionFactory().openSession();
+        Transaction transaction = session.beginTransaction();
         int warehouseId;
         Warehouse withHighestId = (Warehouse) session.createCriteria(Warehouse.class)
                 .addOrder(Order.desc("warehouseId"))
                 .setMaxResults(1)
                 .uniqueResult();
-        tx.commit();
         if (withHighestId == null) {
             warehouseId = 0;
         } else {
             warehouseId = withHighestId.getWarehouseId() + 1;
         }
         Warehouse w = new Warehouse(warehouseId, name);
-        tx = session.beginTransaction();
-
         session.save(w);
-        tx.commit();
+        transaction.commit();
         session.close();
+        return w;
+    }
 
-        List<storagepanel> panels = frame.getPanels();
-        panels.add(new storagepanel(w, frame));
-        frame.getWarehouses().add(w);
-        frame.getTabs().add(name, panels.get(panels.size() - 1));
-        return 0;
+    private static Warehouse findWarehouseByName(String name) {
+        Session session = NewHibernateUtil.getSessionFactory().openSession();
+        Transaction transaction = session.beginTransaction();
+        Warehouse existingWarehouse = (Warehouse) session.createCriteria(Warehouse.class)
+                .add(Restrictions.and(
+                        Restrictions.eq("name", name)
+                )).uniqueResult();
+        transaction.commit();
+        session.close();
+        return existingWarehouse;
     }
 }
