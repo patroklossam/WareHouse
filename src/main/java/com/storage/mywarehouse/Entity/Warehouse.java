@@ -19,7 +19,11 @@ public class Warehouse  implements java.io.Serializable {
        this.warehouseId = warehouseId;
        this.name = name;
     }
-   
+
+    public Warehouse(String name) {
+        this.name = name;
+    }
+
     public int getWarehouseId() {
         return this.warehouseId;
     }

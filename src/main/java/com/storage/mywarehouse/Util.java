@@ -109,7 +109,8 @@ public class Util {
             return -1;
         }
 
-        Warehouse w = WarehouseDAO.saveWithName(name);
+        Warehouse warehouse = new Warehouse(name);
+        Warehouse w = WarehouseDAO.save(warehouse);
         List<storagepanel> panels = frame.getPanels();
         panels.add(new storagepanel(w, frame));
         frame.getWarehouses().add(w);

@@ -34,7 +34,7 @@ public class WarehouseDAO {
         return existingWarehouse;
     }
 
-    public static Warehouse saveWithName(String name) {
+    public static Warehouse save(Warehouse warehouse) {
         Session session = NewHibernateUtil.getSessionFactory().openSession();
         Transaction transaction = session.beginTransaction();
         int warehouseId;
@@ -47,10 +47,10 @@ public class WarehouseDAO {
         } else {
             warehouseId = withHighestId.getWarehouseId() + 1;
         }
-        Warehouse w = new Warehouse(warehouseId, name);
-        session.save(w);
+        warehouse.setWarehouseId(warehouseId);
+        session.save(warehouse);
         transaction.commit();
         session.close();
-        return w;
+        return warehouse;
     }
 }
