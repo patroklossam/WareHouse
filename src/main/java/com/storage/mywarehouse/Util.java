@@ -5,6 +5,7 @@
  */
 package com.storage.mywarehouse;
 
+import com.storage.mywarehouse.Dao.ProductDAO;
 import com.storage.mywarehouse.Dao.QuantityHistoryViewDAO;
 import com.storage.mywarehouse.Entity.Product;
 import com.storage.mywarehouse.Entity.Warehouse;
@@ -63,14 +64,14 @@ public class Util {
         if ("".equals(brand) || "".equals(type)) {
             return null;
         }
-        if (findProductBy(brand, type) != null) {
+        if (ProductDAO.findBy(brand, type) != null) {
             System.out.println("Product of brand " + brand + " and type " + type + " already exists!");
             return null;
         }
 
         String description = record.get(ProductHeader.DESCRIPTION);
         double price = Double.parseDouble(record.get(ProductHeader.PRICE));
-        return saveProductWith(brand, type, description, price);
+        return ProductDAO.saveWith(brand, type, description, price);
     }
 
     public static String parseWarehouses(File file, mainframe frame) throws IOException {
@@ -117,36 +118,6 @@ public class Util {
         frame.getWarehouses().add(w);
         frame.getTabs().add(name, panels.get(panels.size() - 1));
         return 0;
-    }
-
-    private static Product saveProductWith(String brand, String type, String description, double price) {
-        int productId;
-        Session session = NewHibernateUtil.getSessionFactory().openSession();
-        Transaction transaction = session.beginTransaction();
-        Product productWithHighestId = (Product) session.createCriteria(Product.class).addOrder(Order.desc("productId")).setMaxResults(1).uniqueResult();
-        transaction.commit();
-        if (productWithHighestId == null) {
-            productId = 0;
-        } else {
-            productId = productWithHighestId.getProductId() + 1;
-        }
-        Product p = new Product(productId, brand, type, description, price);
-        transaction = session.beginTransaction();
-        session.save(p);
-        transaction.commit();
-        session.close();
-        return p;
-    }
-
-    private static Product findProductBy(String brand, String type) {
-        Session session = NewHibernateUtil.getSessionFactory().openSession();
-        Transaction transaction = session.beginTransaction();
-        Product existingProduct = (Product) session.createCriteria(Product.class)
-                .add(and(eq("brand", brand), eq("type", type)))
-                .uniqueResult();
-        transaction.commit();
-        session.close();
-        return existingProduct;
     }
 
     private static Warehouse saveWarehouseWithName(String name) {
