@@ -4,6 +4,7 @@ import com.storage.mywarehouse.Entity.Product;
 import com.storage.mywarehouse.Hibernate.NewHibernateUtil;
 import org.hibernate.Session;
 import org.hibernate.Transaction;
+import org.hibernate.criterion.MatchMode;
 import org.hibernate.criterion.Order;
 import org.hibernate.criterion.Restrictions;
 
@@ -14,11 +15,23 @@ import static org.hibernate.criterion.Restrictions.eq;
 
 public class ProductDAO {
 
-    public static List findAll() {
+    @SuppressWarnings("unchecked")
+    public static List<Product> findAll() {
         Session session = NewHibernateUtil.getSessionFactory().openSession();
         Transaction transaction = session.beginTransaction();
         List products = session.createCriteria(Product.class).list();
         transaction.commit();
+        session.close();
+        return products;
+    }
+
+    @SuppressWarnings("unchecked")
+    public static List<Product> findAllByBrandAndTypeStartLike(String brand, String type) {
+        Session session = NewHibernateUtil.getSessionFactory().openSession();
+        List products = session.createCriteria(Product.class).add(
+                and(eq("brand", brand),
+                        Restrictions.like("type", type, MatchMode.START)))
+                .list();
         session.close();
         return products;
     }

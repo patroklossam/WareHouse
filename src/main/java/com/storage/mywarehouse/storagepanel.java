@@ -277,11 +277,10 @@ public class storagepanel extends javax.swing.JPanel {
     }// </editor-fold>//GEN-END:initComponents
 
     private void jButton1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton1ActionPerformed
-        List products = ProductDAO.findAll();
+        List<Product> products = ProductDAO.findAll();
         String[] prodArray = new String[products.size()];
         int i = 0;
-        for (Iterator it = products.iterator(); it.hasNext();) {
-            Product prod = (Product) it.next();
+        for (Product prod : products) {
             prodArray[i] = prod.getBrand() + "_" + prod.getType() + "_" + prod.getProductId();
             i++;
         }
