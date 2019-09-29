@@ -8,15 +8,13 @@ package com.storage.mywarehouse;
 
 import com.storage.mywarehouse.Dao.EntryDAO;
 import com.storage.mywarehouse.Dao.ProductDAO;
+import com.storage.mywarehouse.Dao.QuantityHistoryDAO;
 import com.storage.mywarehouse.Dao.WarehouseEntryDAO;
 import com.storage.mywarehouse.Entity.Entry;
 import com.storage.mywarehouse.Entity.Product;
-import com.storage.mywarehouse.Entity.QuantityHistory;
 import com.storage.mywarehouse.Entity.Warehouse;
-import com.storage.mywarehouse.Hibernate.NewHibernateUtil;
 import com.storage.mywarehouse.View.WarehouseEntry;
 import java.util.ArrayList;
-import java.util.Date;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
@@ -26,9 +24,6 @@ import javax.swing.event.ChangeEvent;
 import javax.swing.table.DefaultTableModel;
 import org.apache.commons.collections.primitives.ArrayIntList;
 import org.apache.commons.collections.primitives.IntList;
-import org.hibernate.Session;
-import org.hibernate.Transaction;
-import org.hibernate.criterion.Order;
 
 /**
  *
@@ -131,24 +126,8 @@ public class storagepanel extends javax.swing.JPanel {
             Entry e = (Entry) rows_entry.get(rowId);
 
             if (e != null) {
-
-                Session session = NewHibernateUtil.getSessionFactory().openSession();
-                Transaction tx = session.beginTransaction();
                 e.setQuantity(Integer.parseInt(jTable1.getValueAt(rowId, 3).toString()));
-                session.update(e);
-                
-                QuantityHistory qh = new QuantityHistory();
-                QuantityHistory pqh = (QuantityHistory) session.createCriteria(QuantityHistory.class).addOrder(Order.desc("id")).setMaxResults(1).uniqueResult();
-                
-                qh.setId(pqh == null ? 0 : pqh.getId() + 1);
-                qh.setDate(new Date());
-                qh.setWareHouseEntryId(e.getEntryId());
-                qh.setQuantity(e.getQuantity());
-                
-                session.save(qh);
-                
-                tx.commit();
-                session.close();
+                QuantityHistoryDAO.saveFrom(e);
             }
         }
     }
