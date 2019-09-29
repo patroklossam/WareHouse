@@ -49,7 +49,6 @@ public final class mainframe extends javax.swing.JFrame implements Observer {
     private List<Warehouse> warehouseList;
     private DefaultTableModel tableModel;
     private DefaultTableModel tableModel_rep;
-    private List productList;
 
     @Override // Observer interface's implemented method
     public void update(Observable o, Object data) {
@@ -632,19 +631,30 @@ public final class mainframe extends javax.swing.JFrame implements Observer {
             String search_code = searchfield.getText();
 
             // fill the table with rows that contain this code ONLY
-            Session session = NewHibernateUtil.getSessionFactory().openSession();
-            Transaction tx = session.beginTransaction();
 
+
+            List productList;
             if (param.equalsIgnoreCase("code")) {
-                productList = session.createCriteria(WarehouseProduct.class).add(Restrictions.eq("productId", Integer.parseInt(search_code))).list();
+                productList = WarehouseProductDAO.findById(Integer.parseInt(search_code));
             } else {
                 String equality = "";
                 if (matchBox.isSelected()) {
-                    productList = session.createCriteria(WarehouseProduct.class).add(Restrictions.eq(param.toLowerCase(), search_code)).list();
+                    Session session = NewHibernateUtil.getSessionFactory().openSession();
+                    Transaction tx = session.beginTransaction();
+                    List products = session.createCriteria(WarehouseProduct.class).add(Restrictions.eq(param.toLowerCase(), search_code)).list();
+                    tx.commit();
+                    session.close();
+
+                    productList = products;
                 } else {
                     search_code = "%" + search_code + "%";
-                    productList = session.createCriteria(WarehouseProduct.class).add(Restrictions.like(param.toLowerCase(), search_code)).list();
+                    Session session = NewHibernateUtil.getSessionFactory().openSession();
+                    Transaction tx = session.beginTransaction();
+                    List products = session.createCriteria(WarehouseProduct.class).add(Restrictions.like(param.toLowerCase(), search_code)).list();
+                    tx.commit();
+                    session.close();
 
+                    productList = products;
                 }
             }
 
@@ -658,9 +668,6 @@ public final class mainframe extends javax.swing.JFrame implements Observer {
                 tableModel.addRow(new Object[]{pr.getProductId(), pr.getBrand(), pr.getType(), pr.getQuantity(), pr.getWarehouse(), init_pr, init_pr - dc_pr});
 
             }
-
-            tx.commit();
-            session.close();
         }
     }//GEN-LAST:event_jButton2ActionPerformed
 
