@@ -6,7 +6,9 @@
  */
 package com.storage.mywarehouse;
 
+import com.storage.mywarehouse.Dao.EntryDAO;
 import com.storage.mywarehouse.Dao.ProductDAO;
+import com.storage.mywarehouse.Dao.WarehouseEntryDAO;
 import com.storage.mywarehouse.Entity.Entry;
 import com.storage.mywarehouse.Entity.Product;
 import com.storage.mywarehouse.Entity.QuantityHistory;
@@ -18,7 +20,6 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
-import javax.swing.JComboBox;
 import javax.swing.JOptionPane;
 import javax.swing.event.CellEditorListener;
 import javax.swing.event.ChangeEvent;
@@ -28,7 +29,6 @@ import org.apache.commons.collections.primitives.IntList;
 import org.hibernate.Session;
 import org.hibernate.Transaction;
 import org.hibernate.criterion.Order;
-import org.hibernate.criterion.Restrictions;
 
 /**
  *
@@ -154,25 +154,14 @@ public class storagepanel extends javax.swing.JPanel {
     }
 
     public void Load() {
-
         DbToRow = new HashMap<>();
-
-        Session session = NewHibernateUtil.getSessionFactory().openSession();
-        Transaction tx = session.beginTransaction();
-
-        rows = session.createCriteria(WarehouseEntry.class).add(Restrictions.eq("warehouseId", st_id)).list();
-
-        rows_entry = session.createCriteria(Entry.class).add(Restrictions.eq("warehouseId", st_id)).list();
+        rows = WarehouseEntryDAO.findByWarehouseId(st_id);
+        rows_entry = EntryDAO.findByWarehouseId(st_id);
         jTable1.setModel(tableModel);
         for (Iterator it = rows.iterator(); it.hasNext();) {
             WarehouseEntry we = (WarehouseEntry) it.next();
             tableModel.addRow(new Object[]{we.getProductId(), we.getBrand(), we.getType(), we.getQuantity(), we.getPrice()});
-
         }
-
-        tx.commit();
-        session.close();
-
     }
 
     /**
