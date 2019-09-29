@@ -7,12 +7,9 @@ package com.storage.mywarehouse;
 
 import com.storage.mywarehouse.Dao.CustomerDAO;
 import com.storage.mywarehouse.Entity.Customer;
-import com.storage.mywarehouse.Hibernate.NewHibernateUtil;
+
 import java.awt.Component;
 import javax.swing.JOptionPane;
-import org.hibernate.Session;
-import org.hibernate.Transaction;
-import org.hibernate.criterion.Order;
 
 /**
  *
@@ -224,19 +221,7 @@ public class clientForm extends javax.swing.JFrame {
         if (update) {
             CustomerDAO.update(customer);
         } else {
-            Session session = NewHibernateUtil.getSessionFactory().openSession();
-            Transaction tx = session.beginTransaction();
-            Customer customerWithHighestId = (Customer) session.createCriteria(Customer.class).addOrder(Order.desc("customerId")).setMaxResults(1).uniqueResult();
-            int nextId;
-            if (customerWithHighestId == null) {
-                nextId = 0;
-            } else {
-                nextId = customerWithHighestId.getCustomerId() + 1;
-            }
-            customer.setCustomerId(nextId);
-            session.save(customer);
-            tx.commit();
-            session.close();
+            CustomerDAO.save(customer);
         }
 
         observable.changeData("refresh_clients");
