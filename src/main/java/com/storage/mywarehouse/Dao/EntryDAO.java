@@ -20,4 +20,12 @@ public class EntryDAO {
         session.close();
         return entries;
     }
+
+    public static void delete(Entry entry) {
+        Session session = NewHibernateUtil.getSessionFactory().openSession();
+        Transaction tx = session.beginTransaction();
+        session.delete(entry);
+        tx.commit();
+        session.close();
+    }
 }

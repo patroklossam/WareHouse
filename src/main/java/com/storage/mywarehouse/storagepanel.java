@@ -325,17 +325,11 @@ public class storagepanel extends javax.swing.JPanel {
             Entry e = (Entry) rows_entry.get(row);
             rows_entry.remove(e);
 
-            Session session = NewHibernateUtil.getSessionFactory().openSession();
-            Transaction tx = session.beginTransaction();
-
-            session.delete(e);
-            tx.commit();
-            session.close();
+            EntryDAO.delete(e);
         } else {
             JOptionPane.showMessageDialog(this, "First click on the row you want to delete.");
         }
     }//GEN-LAST:event_jButton4ActionPerformed
-
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JButton jButton1;
