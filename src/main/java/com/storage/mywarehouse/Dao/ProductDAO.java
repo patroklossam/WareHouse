@@ -1,7 +1,6 @@
 package com.storage.mywarehouse.Dao;
 
 import com.storage.mywarehouse.Entity.Product;
-import com.storage.mywarehouse.Hibernate.NewHibernateUtil;
 import org.hibernate.Session;
 import org.hibernate.Transaction;
 import org.hibernate.criterion.MatchMode;

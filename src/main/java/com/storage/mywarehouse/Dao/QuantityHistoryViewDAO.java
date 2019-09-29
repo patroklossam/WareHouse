@@ -1,6 +1,5 @@
 package com.storage.mywarehouse.Dao;
 
-import com.storage.mywarehouse.Hibernate.NewHibernateUtil;
 import com.storage.mywarehouse.View.QuantityHistoryView;
 import org.hibernate.Session;
 import org.hibernate.criterion.Order;

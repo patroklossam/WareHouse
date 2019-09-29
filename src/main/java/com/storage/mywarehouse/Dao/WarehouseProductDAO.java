@@ -1,6 +1,5 @@
 package com.storage.mywarehouse.Dao;
 
-import com.storage.mywarehouse.Hibernate.NewHibernateUtil;
 import com.storage.mywarehouse.View.WarehouseProduct;
 import org.hibernate.Session;
 import org.hibernate.Transaction;

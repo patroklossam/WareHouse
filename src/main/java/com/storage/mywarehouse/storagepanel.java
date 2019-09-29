@@ -6,10 +6,7 @@
  */
 package com.storage.mywarehouse;
 
-import com.storage.mywarehouse.Dao.EntryDAO;
-import com.storage.mywarehouse.Dao.ProductDAO;
-import com.storage.mywarehouse.Dao.QuantityHistoryDAO;
-import com.storage.mywarehouse.Dao.WarehouseEntryDAO;
+import com.storage.mywarehouse.Dao.*;
 import com.storage.mywarehouse.Entity.Entry;
 import com.storage.mywarehouse.Entity.Product;
 import com.storage.mywarehouse.Entity.Warehouse;
