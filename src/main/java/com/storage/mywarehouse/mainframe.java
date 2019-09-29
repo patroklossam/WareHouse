@@ -16,7 +16,6 @@ import org.apache.commons.collections.primitives.ArrayDoubleList;
 import org.apache.commons.collections.primitives.DoubleList;
 import org.hibernate.Session;
 import org.hibernate.Transaction;
-import org.hibernate.criterion.Restrictions;
 
 import javax.swing.*;
 import javax.swing.event.ChangeEvent;
@@ -641,14 +640,7 @@ public final class mainframe extends javax.swing.JFrame implements Observer {
                 if (matchBox.isSelected()) {
                     productList = WarehouseProductDAO.findByParam(param, search_code);
                 } else {
-                    search_code = "%" + search_code + "%";
-                    Session session = NewHibernateUtil.getSessionFactory().openSession();
-                    Transaction tx = session.beginTransaction();
-                    List products = session.createCriteria(WarehouseProduct.class).add(Restrictions.like(param.toLowerCase(), search_code)).list();
-                    tx.commit();
-                    session.close();
-
-                    productList = products;
+                    productList = WarehouseProductDAO.findByParamContainingValue(param, search_code);
                 }
             }
 
