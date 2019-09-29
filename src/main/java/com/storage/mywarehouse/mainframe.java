@@ -50,7 +50,6 @@ public final class mainframe extends javax.swing.JFrame implements Observer {
     private DefaultTableModel tableModel;
     private DefaultTableModel tableModel_rep;
     private List productList;
-    private List reporterProductList;
 
     @Override // Observer interface's implemented method
     public void update(Observable o, Object data) {
@@ -190,7 +189,6 @@ public final class mainframe extends javax.swing.JFrame implements Observer {
     }
 
     private void cleanEmptyUntitledTabs() {
-
         for (int i = 0; i < panels.size(); i++) {
             if (tab.getTitleAt(i + 2).length() < 2) {
                 if (panels.get(i).getTableModel().getRowCount() == 0) {
@@ -201,26 +199,18 @@ public final class mainframe extends javax.swing.JFrame implements Observer {
         }
     }
 
-    public void fillInReporter() {
-
+    private void fillInReporter() {
         //clean reporter
         int rows = tableModel_rep.getRowCount();
         for (int i = 0; i < rows; i++) {
             tableModel_rep.removeRow(0);
         }
 
-        int quantity = 0;
-
-        reporterProductList = WarehouseProductDAO.findByQuantity(quantity);
-
+        List<WarehouseProduct> reporterProductList = WarehouseProductDAO.findByQuantity(0);
         // fill in table with zero quantities
-        for (Iterator it = reporterProductList.iterator(); it.hasNext();) {
-            WarehouseProduct pr = (WarehouseProduct) it.next();
-
+        for (WarehouseProduct pr : reporterProductList) {
             tableModel_rep.addRow(new Object[]{pr.getProductId(), pr.getBrand(), pr.getType(), pr.getQuantity(), pr.getWarehouse()});
-
         }
-
     }
 
     /**
