@@ -284,15 +284,8 @@ public class storagepanel extends javax.swing.JPanel {
 
         int prodId = Integer.parseInt(selectedProduct.substring(selectedProduct.lastIndexOf('_') + 1));
 
-        Session session = NewHibernateUtil.getSessionFactory().openSession();
-        Transaction tx = session.beginTransaction();
-        Entry entry = (Entry) session.createCriteria(Entry.class).addOrder(Order.desc("entryId")).setMaxResults(1).uniqueResult();
-        int entryId = entry == null ? 0 : entry.getEntryId() + 1;
-        Entry e = new Entry(entryId, st_id, prodId, 0);
-        session.save(e);
-        tx.commit();
-        session.close();
-
+        int warehouseId = this.st_id;
+        Entry e = EntryDAO.save(new Entry(-1, warehouseId, prodId, 0));
         Product pr = ProductDAO.findById(prodId);
         tableModel.addRow(new Object[]{pr.getProductId(), pr.getBrand(), pr.getType(), 0, pr.getPrice()});
         rows_entry.add(e);

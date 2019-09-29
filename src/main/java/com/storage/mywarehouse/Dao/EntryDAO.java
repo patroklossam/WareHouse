@@ -4,6 +4,7 @@ import com.storage.mywarehouse.Entity.Entry;
 import com.storage.mywarehouse.Hibernate.NewHibernateUtil;
 import org.hibernate.Session;
 import org.hibernate.Transaction;
+import org.hibernate.criterion.Order;
 import org.hibernate.criterion.Restrictions;
 
 import java.util.List;
@@ -19,6 +20,21 @@ public class EntryDAO {
         tx.commit();
         session.close();
         return entries;
+    }
+
+    public static Entry save(Entry entry) {
+        Session session = NewHibernateUtil.getSessionFactory().openSession();
+        Transaction tx = session.beginTransaction();
+        Entry entryWithHighestId = (Entry) session.createCriteria(Entry.class)
+                .addOrder(Order.desc("entryId"))
+                .setMaxResults(1)
+                .uniqueResult();
+        int entryId = entryWithHighestId == null ? 0 : entryWithHighestId.getEntryId() + 1;
+        entry.setEntryId(entryId);
+        session.save(entry);
+        tx.commit();
+        session.close();
+        return entry;
     }
 
     public static void delete(Entry entry) {
