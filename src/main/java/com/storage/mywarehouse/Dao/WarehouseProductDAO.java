@@ -32,4 +32,16 @@ public class WarehouseProductDAO {
         session.close();
         return emptyWarehouseProduct;
     }
+
+    @SuppressWarnings("unchecked")
+    public static List<WarehouseProduct> findByParam(String param, String value) {
+        Session session = NewHibernateUtil.getSessionFactory().openSession();
+        Transaction tx = session.beginTransaction();
+        List products = session.createCriteria(WarehouseProduct.class)
+                .add(Restrictions.eq(param.toLowerCase(), value))
+                .list();
+        tx.commit();
+        session.close();
+        return products;
+    }
 }

@@ -639,13 +639,7 @@ public final class mainframe extends javax.swing.JFrame implements Observer {
             } else {
                 String equality = "";
                 if (matchBox.isSelected()) {
-                    Session session = NewHibernateUtil.getSessionFactory().openSession();
-                    Transaction tx = session.beginTransaction();
-                    List products = session.createCriteria(WarehouseProduct.class).add(Restrictions.eq(param.toLowerCase(), search_code)).list();
-                    tx.commit();
-                    session.close();
-
-                    productList = products;
+                    productList = WarehouseProductDAO.findByParam(param, search_code);
                 } else {
                     search_code = "%" + search_code + "%";
                     Session session = NewHibernateUtil.getSessionFactory().openSession();
