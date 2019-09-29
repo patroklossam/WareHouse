@@ -711,21 +711,14 @@ public final class mainframe extends javax.swing.JFrame implements Observer {
 
     private void jMenuItem2ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jMenuItem2ActionPerformed
         int tabId = tab.getSelectedIndex();
-        if (tabId > 1) {
-
-            Session session = NewHibernateUtil.getSessionFactory().openSession();
-            Transaction tx = session.beginTransaction();
-
-            session.delete(panels.get(tabId - 2).getWarehouse());
-            tx.commit();
-            session.close();
-
-            tab.remove(tabId);
-            panels.remove(tabId - 2);
-
+        if (tabId <= 1) {
+            return;
         }
 
-
+        Warehouse warehouse = panels.get(tabId - 2).getWarehouse();
+        WarehouseDAO.deleteWarehouse(warehouse);
+        tab.remove(tabId);
+        panels.remove(tabId - 2);
     }//GEN-LAST:event_jMenuItem2ActionPerformed
 
     private void jMenuItem4ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jMenuItem4ActionPerformed
