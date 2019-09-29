@@ -54,7 +54,15 @@ public class WarehouseDAO {
         return warehouse;
     }
 
-    public static void deleteWarehouse(Warehouse warehouse) {
+    public static void update(Warehouse wh) {
+        Session session = NewHibernateUtil.getSessionFactory().openSession();
+        Transaction tx = session.beginTransaction();
+        session.update(wh);
+        tx.commit();
+        session.close();
+    }
+
+    public static void delete(Warehouse warehouse) {
         Session session = NewHibernateUtil.getSessionFactory().openSession();
         Transaction tx = session.beginTransaction();
         session.delete(warehouse);

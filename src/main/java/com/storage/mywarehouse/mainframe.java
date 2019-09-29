@@ -716,7 +716,7 @@ public final class mainframe extends javax.swing.JFrame implements Observer {
         }
 
         Warehouse warehouse = panels.get(tabId - 2).getWarehouse();
-        WarehouseDAO.deleteWarehouse(warehouse);
+        WarehouseDAO.delete(warehouse);
         tab.remove(tabId);
         panels.remove(tabId - 2);
     }//GEN-LAST:event_jMenuItem2ActionPerformed
@@ -909,13 +909,9 @@ class TabTitleEditListener extends MouseAdapter implements ChangeListener {
             Warehouse wh = panels.get(editing_idx - 2).getWarehouse();
             wh.setName(title);
 
-            Session session = NewHibernateUtil.getSessionFactory().openSession();
-            Transaction tx = session.beginTransaction();
-            session.update(wh);
-            tx.commit();
-            session.close();
-
+            WarehouseDAO.update(wh);
         }
+
         cancelEditing();
         observable.changeData("refresh");
     }
