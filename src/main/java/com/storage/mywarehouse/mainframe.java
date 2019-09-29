@@ -7,6 +7,7 @@
 package com.storage.mywarehouse;
 
 import com.storage.mywarehouse.Dao.WarehouseDAO;
+import com.storage.mywarehouse.Dao.WarehouseProductDAO;
 import com.storage.mywarehouse.Entity.Customer;
 import com.storage.mywarehouse.Entity.Warehouse;
 import com.storage.mywarehouse.Hibernate.NewHibernateUtil;
@@ -210,7 +211,7 @@ public final class mainframe extends javax.swing.JFrame implements Observer {
 
         int quantity = 0;
 
-        reporterProductList = findWarehouseProductByQuantity(quantity);
+        reporterProductList = WarehouseProductDAO.findByQuantity(quantity);
 
         // fill in table with zero quantities
         for (Iterator it = reporterProductList.iterator(); it.hasNext();) {
@@ -220,15 +221,6 @@ public final class mainframe extends javax.swing.JFrame implements Observer {
 
         }
 
-    }
-
-    private List findWarehouseProductByQuantity(int quantity) {
-        Session session = NewHibernateUtil.getSessionFactory().openSession();
-        Transaction tx = session.beginTransaction();
-        List emptyWarehouseProduct = session.createCriteria(WarehouseProduct.class).add(Restrictions.eq("quantity", quantity)).list();
-        tx.commit();
-        session.close();
-        return emptyWarehouseProduct;
     }
 
     /**
