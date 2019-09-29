@@ -614,46 +614,37 @@ public final class mainframe extends javax.swing.JFrame implements Observer {
     }//GEN-LAST:event_searchfieldActionPerformed
 
     private void jButton2ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton2ActionPerformed
+        if (searchfield.getText().length() <= 0) {
+            return;
+        }
 
-        if (searchfield.getText().length() > 0) {
+        //first we clean the whole generic table
+        int rows = tableModel.getRowCount();
+        for (int i = 0; i < rows; i++) {
+            tableModel.removeRow(0);
+        }
 
-            //first we clean the whole generic table
-            int rows = tableModel.getRowCount();
-            for (int i = 0; i < rows; i++) {
-                tableModel.removeRow(0);
-            }
+        // get what to search for
+        String param = searchParam.getSelectedItem().toString();
 
-            // get what to search for
-            String param = searchParam.getSelectedItem().toString();
+        //get the desired code
+        String search_code = searchfield.getText();
 
-            //get the desired code
-            String search_code = searchfield.getText();
+        // fill the table with rows that contain this code ONLY
+        List<WarehouseProduct> productList;
+        if (param.equalsIgnoreCase("code")) {
+            productList = WarehouseProductDAO.findById(Integer.parseInt(search_code));
+        } else if (matchBox.isSelected()) {
+            productList = WarehouseProductDAO.findByParam(param, search_code);
+        } else {
+            productList = WarehouseProductDAO.findByParamContainingValue(param, search_code);
+        }
 
-            // fill the table with rows that contain this code ONLY
-
-
-            List productList;
-            if (param.equalsIgnoreCase("code")) {
-                productList = WarehouseProductDAO.findById(Integer.parseInt(search_code));
-            } else {
-                String equality = "";
-                if (matchBox.isSelected()) {
-                    productList = WarehouseProductDAO.findByParam(param, search_code);
-                } else {
-                    productList = WarehouseProductDAO.findByParamContainingValue(param, search_code);
-                }
-            }
-
-            for (Iterator it = productList.iterator(); it.hasNext();) {
-                WarehouseProduct pr = (WarehouseProduct) it.next();
-
-                double init_pr = pr.getPrice();
-                double dc = Double.parseDouble(dc_label.getText());
-                double dc_pr = init_pr * dc / 100;
-
-                tableModel.addRow(new Object[]{pr.getProductId(), pr.getBrand(), pr.getType(), pr.getQuantity(), pr.getWarehouse(), init_pr, init_pr - dc_pr});
-
-            }
+        for (WarehouseProduct pr : productList) {
+            double init_pr = pr.getPrice();
+            double dc = Double.parseDouble(dc_label.getText());
+            double dc_pr = init_pr * dc / 100;
+            tableModel.addRow(new Object[]{pr.getProductId(), pr.getBrand(), pr.getType(), pr.getQuantity(), pr.getWarehouse(), init_pr, init_pr - dc_pr});
         }
     }//GEN-LAST:event_jButton2ActionPerformed
 
