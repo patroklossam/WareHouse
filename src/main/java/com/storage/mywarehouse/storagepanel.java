@@ -285,7 +285,7 @@ public class storagepanel extends javax.swing.JPanel {
         int prodId = Integer.parseInt(selectedProduct.substring(selectedProduct.lastIndexOf('_') + 1));
 
         int warehouseId = this.st_id;
-        Entry e = EntryDAO.save(new Entry(-1, warehouseId, prodId, 0));
+        Entry e = EntryDAO.save(new Entry(warehouseId, prodId, 0));
         Product pr = ProductDAO.findById(prodId);
         tableModel.addRow(new Object[]{pr.getProductId(), pr.getBrand(), pr.getType(), 0, pr.getPrice()});
         rows_entry.add(e);

@@ -23,6 +23,12 @@ public class Entry  implements java.io.Serializable {
        this.productId = productId;
        this.quantity = quantity;
     }
+
+    public Entry(int warehouseId, int productId, int quantity) {
+        this.warehouseId = warehouseId;
+        this.productId = productId;
+        this.quantity = quantity;
+    }
    
     public int getEntryId() {
         return this.entryId;
