@@ -619,17 +619,14 @@ public final class mainframe extends javax.swing.JFrame implements Observer {
     private void jMenuItem1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jMenuItem1ActionPerformed
         String name = JOptionPane.showInputDialog(this, "Enter name for the new warehouse");
 
-        if (name != null) {
+        if (name == null) {
+            return;
+        }
 
-            Session session = NewHibernateUtil.getSessionFactory().openSession();
-            int retcode = Util.addWarehouse(name, this);
-            session.close();
-
-            if (retcode < 0) {
-                JOptionPane.showMessageDialog(null, "Warehouse exists!");
-            } else {
-                JOptionPane.showMessageDialog(null, "Successfully added new warehouse.");
-            }
+        if (Util.addWarehouse(name, this) < 0) {
+            JOptionPane.showMessageDialog(null, "Warehouse exists!");
+        } else {
+            JOptionPane.showMessageDialog(null, "Successfully added new warehouse.");
         }
     }//GEN-LAST:event_jMenuItem1ActionPerformed
 
