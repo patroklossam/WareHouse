@@ -6,7 +6,19 @@ import org.hibernate.Session;
 import org.hibernate.Transaction;
 import org.hibernate.criterion.Order;
 
+import java.util.List;
+
 public class CustomerDAO {
+    @SuppressWarnings("unchecked")
+    public static List<Customer> findAll() {
+        Session session = NewHibernateUtil.getSessionFactory().openSession();
+        Transaction tx = session.beginTransaction();
+        List customers = session.createCriteria(Customer.class).list();
+        tx.commit();
+        session.close();
+        return customers;
+    }
+
     public static void save(Customer customer) {
         Session session = NewHibernateUtil.getSessionFactory().openSession();
         Transaction tx = session.beginTransaction();
