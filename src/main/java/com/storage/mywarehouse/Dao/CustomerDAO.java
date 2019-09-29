@@ -30,4 +30,12 @@ public class CustomerDAO {
         tx.commit();
         session.close();
     }
+
+    public static void delete(Customer customer) {
+        Session session = NewHibernateUtil.getSessionFactory().openSession();
+        Transaction tx = session.beginTransaction();
+        session.delete(customer);
+        tx.commit();
+        session.close();
+    }
 }
