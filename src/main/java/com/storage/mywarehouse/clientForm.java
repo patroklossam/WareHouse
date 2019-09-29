@@ -18,7 +18,7 @@ import javax.swing.JOptionPane;
 public class clientForm extends javax.swing.JFrame {
 
     private final MyObservable observable = new MyObservable();
-    private boolean update = false;
+    private boolean update;
     private Customer customer;
 
     /**
@@ -27,6 +27,7 @@ public class clientForm extends javax.swing.JFrame {
      * @param frame for use in observer
      */
     public clientForm(mainframe frame) {
+        this.customer = new Customer();
         update = false;
         observable.addObserver(frame);
         Globals.ClientsFrame = true;
@@ -212,7 +213,6 @@ public class clientForm extends javax.swing.JFrame {
             full_dc = 0.0;
         }
 
-        customer = new Customer();
         customer.setName(cName);
         customer.setLastName(cLastName);
         customer.setOccupation(full_job);
@@ -232,7 +232,6 @@ public class clientForm extends javax.swing.JFrame {
         }
         Globals.ClientsFrame = false;
         dispose();
-
     }//GEN-LAST:event_jButton1ActionPerformed
 
     private void jButton2ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton2ActionPerformed
