@@ -5,11 +5,10 @@
  */
 package com.storage.mywarehouse;
 
+import com.storage.mywarehouse.Dao.CustomerDAO;
 import com.storage.mywarehouse.Entity.Customer;
-import com.storage.mywarehouse.Entity.Product;
 import com.storage.mywarehouse.Hibernate.NewHibernateUtil;
 import java.awt.Component;
-import java.util.List;
 import javax.swing.JOptionPane;
 import org.hibernate.Session;
 import org.hibernate.Transaction;
@@ -194,30 +193,11 @@ public class clientForm extends javax.swing.JFrame {
     }// </editor-fold>//GEN-END:initComponents
 
     private void jButton1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton1ActionPerformed
-
-        Session session = NewHibernateUtil.getSessionFactory().openSession();
-        customer = new Customer();
-        Transaction tx = null;
-
-        if (!update) {
-            tx = session.beginTransaction();
-            int nextId = 0;
-            
-            Customer customerWithHighestId = (Customer) session.createCriteria(Customer.class).addOrder(Order.desc("customerId")).setMaxResults(1).uniqueResult();
-            tx.commit();
-            if (customerWithHighestId == null) {
-                nextId = 0;
-            } else {
-                nextId = customerWithHighestId.getCustomerId() + 1;
-            }
-            
-            customer.setCustomerId(nextId);
-        }
-
         String cName = "";
         String cLastName = "";
         String full_job;
         double full_dc;
+
         if (clientSurname.getText().length() > 0) {
             cLastName += clientSurname.getText();
         }
@@ -235,19 +215,29 @@ public class clientForm extends javax.swing.JFrame {
             full_dc = 0.0;
         }
 
+        customer = new Customer();
         customer.setName(cName);
         customer.setLastName(cLastName);
         customer.setOccupation(full_job);
         customer.setDiscount(full_dc);
 
-        tx = session.beginTransaction();
         if (update) {
-            session.update(customer);
+            CustomerDAO.update(customer);
         } else {
+            Session session = NewHibernateUtil.getSessionFactory().openSession();
+            Transaction tx = session.beginTransaction();
+            Customer customerWithHighestId = (Customer) session.createCriteria(Customer.class).addOrder(Order.desc("customerId")).setMaxResults(1).uniqueResult();
+            int nextId;
+            if (customerWithHighestId == null) {
+                nextId = 0;
+            } else {
+                nextId = customerWithHighestId.getCustomerId() + 1;
+            }
+            customer.setCustomerId(nextId);
             session.save(customer);
+            tx.commit();
+            session.close();
         }
-        tx.commit();
-        session.close();
 
         observable.changeData("refresh_clients");
         if (update) {
