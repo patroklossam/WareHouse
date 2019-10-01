@@ -7,6 +7,7 @@
 package com.storage.mywarehouse;
 
 import com.storage.mywarehouse.Dao.WarehouseDAO;
+import com.storage.mywarehouse.Dao.WarehouseProductDAO;
 import com.storage.mywarehouse.Entity.Customer;
 import com.storage.mywarehouse.Entity.Warehouse;
 import com.storage.mywarehouse.Hibernate.NewHibernateUtil;
@@ -15,7 +16,6 @@ import org.apache.commons.collections.primitives.ArrayDoubleList;
 import org.apache.commons.collections.primitives.DoubleList;
 import org.hibernate.Session;
 import org.hibernate.Transaction;
-import org.hibernate.criterion.Restrictions;
 
 import javax.swing.*;
 import javax.swing.event.ChangeEvent;
@@ -48,8 +48,6 @@ public final class mainframe extends javax.swing.JFrame implements Observer {
     private List<Warehouse> warehouseList;
     private DefaultTableModel tableModel;
     private DefaultTableModel tableModel_rep;
-    private List productList;
-    private List reporterProductList;
 
     @Override // Observer interface's implemented method
     public void update(Observable o, Object data) {
@@ -189,7 +187,6 @@ public final class mainframe extends javax.swing.JFrame implements Observer {
     }
 
     private void cleanEmptyUntitledTabs() {
-
         for (int i = 0; i < panels.size(); i++) {
             if (tab.getTitleAt(i + 2).length() < 2) {
                 if (panels.get(i).getTableModel().getRowCount() == 0) {
@@ -200,35 +197,18 @@ public final class mainframe extends javax.swing.JFrame implements Observer {
         }
     }
 
-    public void fillInReporter() {
-
+    private void fillInReporter() {
         //clean reporter
         int rows = tableModel_rep.getRowCount();
         for (int i = 0; i < rows; i++) {
             tableModel_rep.removeRow(0);
         }
 
-        int quantity = 0;
-
-        reporterProductList = findWarehouseProductByQuantity(quantity);
-
+        List<WarehouseProduct> reporterProductList = WarehouseProductDAO.findByQuantity(0);
         // fill in table with zero quantities
-        for (Iterator it = reporterProductList.iterator(); it.hasNext();) {
-            WarehouseProduct pr = (WarehouseProduct) it.next();
-
+        for (WarehouseProduct pr : reporterProductList) {
             tableModel_rep.addRow(new Object[]{pr.getProductId(), pr.getBrand(), pr.getType(), pr.getQuantity(), pr.getWarehouse()});
-
         }
-
-    }
-
-    private List findWarehouseProductByQuantity(int quantity) {
-        Session session = NewHibernateUtil.getSessionFactory().openSession();
-        Transaction tx = session.beginTransaction();
-        List emptyWarehouseProduct = session.createCriteria(WarehouseProduct.class).add(Restrictions.eq("quantity", quantity)).list();
-        tx.commit();
-        session.close();
-        return emptyWarehouseProduct;
     }
 
     /**
@@ -634,51 +614,37 @@ public final class mainframe extends javax.swing.JFrame implements Observer {
     }//GEN-LAST:event_searchfieldActionPerformed
 
     private void jButton2ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton2ActionPerformed
+        if (searchfield.getText().length() <= 0) {
+            return;
+        }
 
-        if (searchfield.getText().length() > 0) {
+        //first we clean the whole generic table
+        int rows = tableModel.getRowCount();
+        for (int i = 0; i < rows; i++) {
+            tableModel.removeRow(0);
+        }
 
-            //first we clean the whole generic table
-            int rows = tableModel.getRowCount();
-            for (int i = 0; i < rows; i++) {
-                tableModel.removeRow(0);
-            }
+        // get what to search for
+        String param = searchParam.getSelectedItem().toString();
 
-            // get what to search for
-            String param = searchParam.getSelectedItem().toString();
+        //get the desired code
+        String search_code = searchfield.getText();
 
-            //get the desired code
-            String search_code = searchfield.getText();
+        // fill the table with rows that contain this code ONLY
+        List<WarehouseProduct> productList;
+        if (param.equalsIgnoreCase("code")) {
+            productList = WarehouseProductDAO.findById(Integer.parseInt(search_code));
+        } else if (matchBox.isSelected()) {
+            productList = WarehouseProductDAO.findByParam(param, search_code);
+        } else {
+            productList = WarehouseProductDAO.findByParamContainingValue(param, search_code);
+        }
 
-            // fill the table with rows that contain this code ONLY
-            Session session = NewHibernateUtil.getSessionFactory().openSession();
-            Transaction tx = session.beginTransaction();
-
-            if (param.equalsIgnoreCase("code")) {
-                productList = session.createCriteria(WarehouseProduct.class).add(Restrictions.eq("productId", Integer.parseInt(search_code))).list();
-            } else {
-                String equality = "";
-                if (matchBox.isSelected()) {
-                    productList = session.createCriteria(WarehouseProduct.class).add(Restrictions.eq(param.toLowerCase(), search_code)).list();
-                } else {
-                    search_code = "%" + search_code + "%";
-                    productList = session.createCriteria(WarehouseProduct.class).add(Restrictions.like(param.toLowerCase(), search_code)).list();
-
-                }
-            }
-
-            for (Iterator it = productList.iterator(); it.hasNext();) {
-                WarehouseProduct pr = (WarehouseProduct) it.next();
-
-                double init_pr = pr.getPrice();
-                double dc = Double.parseDouble(dc_label.getText());
-                double dc_pr = init_pr * dc / 100;
-
-                tableModel.addRow(new Object[]{pr.getProductId(), pr.getBrand(), pr.getType(), pr.getQuantity(), pr.getWarehouse(), init_pr, init_pr - dc_pr});
-
-            }
-
-            tx.commit();
-            session.close();
+        for (WarehouseProduct pr : productList) {
+            double init_pr = pr.getPrice();
+            double dc = Double.parseDouble(dc_label.getText());
+            double dc_pr = init_pr * dc / 100;
+            tableModel.addRow(new Object[]{pr.getProductId(), pr.getBrand(), pr.getType(), pr.getQuantity(), pr.getWarehouse(), init_pr, init_pr - dc_pr});
         }
     }//GEN-LAST:event_jButton2ActionPerformed
 
