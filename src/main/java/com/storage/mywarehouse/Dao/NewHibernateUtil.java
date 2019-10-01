@@ -1,4 +1,4 @@
-package com.storage.mywarehouse.Hibernate;
+package com.storage.mywarehouse.Dao;
 
 /*
  * To change this license header, choose License Headers in Project Properties.
@@ -15,7 +15,7 @@ import org.hibernate.SessionFactory;
  *
  * @author C5247463
  */
-public class NewHibernateUtil {
+class NewHibernateUtil {
 
     private static final SessionFactory sessionFactory;
     
@@ -31,7 +31,7 @@ public class NewHibernateUtil {
         }
     }
     
-    public static SessionFactory getSessionFactory() {
+    static SessionFactory getSessionFactory() {
         return sessionFactory;
     }
 }

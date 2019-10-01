@@ -6,29 +6,21 @@
  */
 package com.storage.mywarehouse;
 
-import com.storage.mywarehouse.Dao.ProductDAO;
+import com.storage.mywarehouse.Dao.*;
 import com.storage.mywarehouse.Entity.Entry;
 import com.storage.mywarehouse.Entity.Product;
-import com.storage.mywarehouse.Entity.QuantityHistory;
 import com.storage.mywarehouse.Entity.Warehouse;
-import com.storage.mywarehouse.Hibernate.NewHibernateUtil;
 import com.storage.mywarehouse.View.WarehouseEntry;
 import java.util.ArrayList;
-import java.util.Date;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
-import javax.swing.JComboBox;
 import javax.swing.JOptionPane;
 import javax.swing.event.CellEditorListener;
 import javax.swing.event.ChangeEvent;
 import javax.swing.table.DefaultTableModel;
 import org.apache.commons.collections.primitives.ArrayIntList;
 import org.apache.commons.collections.primitives.IntList;
-import org.hibernate.Session;
-import org.hibernate.Transaction;
-import org.hibernate.criterion.Order;
-import org.hibernate.criterion.Restrictions;
 
 /**
  *
@@ -131,48 +123,21 @@ public class storagepanel extends javax.swing.JPanel {
             Entry e = (Entry) rows_entry.get(rowId);
 
             if (e != null) {
-
-                Session session = NewHibernateUtil.getSessionFactory().openSession();
-                Transaction tx = session.beginTransaction();
                 e.setQuantity(Integer.parseInt(jTable1.getValueAt(rowId, 3).toString()));
-                session.update(e);
-                
-                QuantityHistory qh = new QuantityHistory();
-                QuantityHistory pqh = (QuantityHistory) session.createCriteria(QuantityHistory.class).addOrder(Order.desc("id")).setMaxResults(1).uniqueResult();
-                
-                qh.setId(pqh == null ? 0 : pqh.getId() + 1);
-                qh.setDate(new Date());
-                qh.setWareHouseEntryId(e.getEntryId());
-                qh.setQuantity(e.getQuantity());
-                
-                session.save(qh);
-                
-                tx.commit();
-                session.close();
+                QuantityHistoryDAO.saveFrom(e);
             }
         }
     }
 
     public void Load() {
-
         DbToRow = new HashMap<>();
-
-        Session session = NewHibernateUtil.getSessionFactory().openSession();
-        Transaction tx = session.beginTransaction();
-
-        rows = session.createCriteria(WarehouseEntry.class).add(Restrictions.eq("warehouseId", st_id)).list();
-
-        rows_entry = session.createCriteria(Entry.class).add(Restrictions.eq("warehouseId", st_id)).list();
+        rows = WarehouseEntryDAO.findByWarehouseId(st_id);
+        rows_entry = EntryDAO.findByWarehouseId(st_id);
         jTable1.setModel(tableModel);
         for (Iterator it = rows.iterator(); it.hasNext();) {
             WarehouseEntry we = (WarehouseEntry) it.next();
             tableModel.addRow(new Object[]{we.getProductId(), we.getBrand(), we.getType(), we.getQuantity(), we.getPrice()});
-
         }
-
-        tx.commit();
-        session.close();
-
     }
 
     /**
@@ -295,15 +260,8 @@ public class storagepanel extends javax.swing.JPanel {
 
         int prodId = Integer.parseInt(selectedProduct.substring(selectedProduct.lastIndexOf('_') + 1));
 
-        Session session = NewHibernateUtil.getSessionFactory().openSession();
-        Transaction tx = session.beginTransaction();
-        Entry entry = (Entry) session.createCriteria(Entry.class).addOrder(Order.desc("entryId")).setMaxResults(1).uniqueResult();
-        int entryId = entry == null ? 0 : entry.getEntryId() + 1;
-        Entry e = new Entry(entryId, st_id, prodId, 0);
-        session.save(e);
-        tx.commit();
-        session.close();
-
+        int warehouseId = this.st_id;
+        Entry e = EntryDAO.save(new Entry(warehouseId, prodId, 0));
         Product pr = ProductDAO.findById(prodId);
         tableModel.addRow(new Object[]{pr.getProductId(), pr.getBrand(), pr.getType(), 0, pr.getPrice()});
         rows_entry.add(e);
@@ -336,17 +294,11 @@ public class storagepanel extends javax.swing.JPanel {
             Entry e = (Entry) rows_entry.get(row);
             rows_entry.remove(e);
 
-            Session session = NewHibernateUtil.getSessionFactory().openSession();
-            Transaction tx = session.beginTransaction();
-
-            session.delete(e);
-            tx.commit();
-            session.close();
+            EntryDAO.delete(e);
         } else {
             JOptionPane.showMessageDialog(this, "First click on the row you want to delete.");
         }
     }//GEN-LAST:event_jButton4ActionPerformed
-
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JButton jButton1;
