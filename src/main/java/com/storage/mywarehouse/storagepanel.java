@@ -6,6 +6,7 @@
  */
 package com.storage.mywarehouse;
 
+import com.storage.mywarehouse.Dao.ProductDAO;
 import com.storage.mywarehouse.Entity.Entry;
 import com.storage.mywarehouse.Entity.Product;
 import com.storage.mywarehouse.Entity.QuantityHistory;
@@ -276,21 +277,13 @@ public class storagepanel extends javax.swing.JPanel {
     }// </editor-fold>//GEN-END:initComponents
 
     private void jButton1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton1ActionPerformed
-
-        Session session = NewHibernateUtil.getSessionFactory().openSession();
-        Transaction tx = session.beginTransaction();
-
-        List products = session.createCriteria(Product.class).list();
-        Product prod = null;
+        List<Product> products = ProductDAO.findAll();
         String[] prodArray = new String[products.size()];
         int i = 0;
-        for (Iterator it = products.iterator(); it.hasNext();) {
-            prod = (Product) it.next();
+        for (Product prod : products) {
             prodArray[i] = prod.getBrand() + "_" + prod.getType() + "_" + prod.getProductId();
             i++;
         }
-
-        JComboBox comboProd = new JComboBox(prodArray);
 
         String selectedProduct = (String) JOptionPane.showInputDialog(this,
                 "PLease select your Product?",
@@ -302,23 +295,18 @@ public class storagepanel extends javax.swing.JPanel {
 
         int prodId = Integer.parseInt(selectedProduct.substring(selectedProduct.lastIndexOf('_') + 1));
 
-        products = session.createCriteria(Product.class).add(Restrictions.eq("productId", prodId)).list();
-        Product pr = (Product) products.get(0);
-
+        Session session = NewHibernateUtil.getSessionFactory().openSession();
+        Transaction tx = session.beginTransaction();
         Entry entry = (Entry) session.createCriteria(Entry.class).addOrder(Order.desc("entryId")).setMaxResults(1).uniqueResult();
-
         int entryId = entry == null ? 0 : entry.getEntryId() + 1;
-
         Entry e = new Entry(entryId, st_id, prodId, 0);
-
         session.save(e);
-
         tx.commit();
         session.close();
 
+        Product pr = ProductDAO.findById(prodId);
         tableModel.addRow(new Object[]{pr.getProductId(), pr.getBrand(), pr.getType(), 0, pr.getPrice()});
         rows_entry.add(e);
-
     }//GEN-LAST:event_jButton1ActionPerformed
 
     private void jTable1KeyTyped(java.awt.event.KeyEvent evt) {//GEN-FIRST:event_jTable1KeyTyped

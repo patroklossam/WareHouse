@@ -6,51 +6,30 @@
  */
 package com.storage.mywarehouse;
 
+import com.storage.mywarehouse.Dao.WarehouseDAO;
 import com.storage.mywarehouse.Entity.Customer;
 import com.storage.mywarehouse.Entity.Warehouse;
 import com.storage.mywarehouse.Hibernate.NewHibernateUtil;
-import com.storage.mywarehouse.View.QuantityHistoryView;
 import com.storage.mywarehouse.View.WarehouseProduct;
-import java.awt.Component;
-import java.awt.Dimension;
-import java.awt.Rectangle;
-import java.awt.event.ActionEvent;
-import java.awt.event.FocusAdapter;
-import java.awt.event.FocusEvent;
-import java.awt.event.KeyAdapter;
-import java.awt.event.KeyEvent;
-import java.awt.event.MouseAdapter;
-import java.awt.event.MouseEvent;
-import java.io.File;
-import java.io.FileWriter;
-import java.io.IOException;
-import java.io.PrintWriter;
-import java.util.ArrayList;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Observable;
-import java.util.Observer;
-import java.util.logging.Level;
-import java.util.logging.Logger;
-import javax.swing.AbstractAction;
-import javax.swing.BorderFactory;
-import javax.swing.JComponent;
-import javax.swing.JFileChooser;
-import javax.swing.JOptionPane;
-import javax.swing.JTabbedPane;
-import javax.swing.JTable;
-import javax.swing.JTextField;
-import javax.swing.KeyStroke;
-import javax.swing.event.ChangeEvent;
-import javax.swing.event.ChangeListener;
-import javax.swing.filechooser.FileNameExtensionFilter;
-import javax.swing.table.DefaultTableModel;
 import org.apache.commons.collections.primitives.ArrayDoubleList;
 import org.apache.commons.collections.primitives.DoubleList;
 import org.hibernate.Session;
 import org.hibernate.Transaction;
-import org.hibernate.criterion.Order;
 import org.hibernate.criterion.Restrictions;
+
+import javax.swing.*;
+import javax.swing.event.ChangeEvent;
+import javax.swing.event.ChangeListener;
+import javax.swing.filechooser.FileNameExtensionFilter;
+import javax.swing.table.DefaultTableModel;
+import java.awt.*;
+import java.awt.event.*;
+import java.io.File;
+import java.io.IOException;
+import java.util.List;
+import java.util.*;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 /**
  *
@@ -103,17 +82,10 @@ public final class mainframe extends javax.swing.JFrame implements Observer {
         customer_dc.add(0.0);
         clientCombo.addItem("Select Customer");
 
-        Session session = NewHibernateUtil.getSessionFactory().openSession();
-
-        Transaction tx = session.beginTransaction();
-
-        customers = session.createCriteria(Customer.class).list();
-
-        tx.commit();
-        session.close();
+        this.customers = findAllCustomers();
 
         if (Globals.ClientsFrame) {
-            clframe.refreshClients(customers);
+            clframe.refreshClients(this.customers);
         }
 
         clientCombo.removeAllItems();
@@ -121,12 +93,21 @@ public final class mainframe extends javax.swing.JFrame implements Observer {
         customer_dc.add(0.0);
         clientCombo.addItem("Customer Selection");
 
-        for (Iterator it = customers.iterator(); it.hasNext();) {
+        for (Iterator it = this.customers.iterator(); it.hasNext();) {
             Customer cust = (Customer) it.next();
             customer_dc.add(cust.getDiscount());
             clientCombo.addItem(cust.getLastName() + " - " + cust.getName());
         }
 
+    }
+
+    private List findAllCustomers() {
+        Session session = NewHibernateUtil.getSessionFactory().openSession();
+        Transaction tx = session.beginTransaction();
+        List customers = session.createCriteria(Customer.class).list();
+        tx.commit();
+        session.close();
+        return customers;
     }
 
     public mainframe() {
@@ -186,26 +167,18 @@ public final class mainframe extends javax.swing.JFrame implements Observer {
         tab.addChangeListener(l);
         tab.addMouseListener(l);
 
-        Session session = NewHibernateUtil.getSessionFactory().openSession();
-        Transaction tx = session.beginTransaction();
+        List<Warehouse> warehouses = WarehouseDAO.findAll();
 
-        List warehouseList = session.createCriteria(Warehouse.class).list();
-
-        if (warehouseList.isEmpty()) {
+        if (warehouses.isEmpty()) {
             JOptionPane.showMessageDialog(this, "No previous configuration found. The program will initiate in a clean state.");
         }
 
-        for (Iterator it = warehouseList.iterator(); it.hasNext();) {
-            Warehouse w = (Warehouse) it.next();
-
+        for (Warehouse w : warehouses) {
             panels.add(new storagepanel(w, this));
             panels.get(panels.size() - 1).Load();
 
             tab.add(w.getName(), panels.get(panels.size() - 1));
         }
-
-        tx.commit();
-        session.close();
 
         fillInReporter();
 
@@ -235,13 +208,9 @@ public final class mainframe extends javax.swing.JFrame implements Observer {
             tableModel_rep.removeRow(0);
         }
 
-        Session session = NewHibernateUtil.getSessionFactory().openSession();
-        Transaction tx = session.beginTransaction();
+        int quantity = 0;
 
-        reporterProductList = session.createCriteria(WarehouseProduct.class).add(Restrictions.eq("quantity", 0)).list();
-
-        tx.commit();
-        session.close();
+        reporterProductList = findWarehouseProductByQuantity(quantity);
 
         // fill in table with zero quantities
         for (Iterator it = reporterProductList.iterator(); it.hasNext();) {
@@ -251,6 +220,15 @@ public final class mainframe extends javax.swing.JFrame implements Observer {
 
         }
 
+    }
+
+    private List findWarehouseProductByQuantity(int quantity) {
+        Session session = NewHibernateUtil.getSessionFactory().openSession();
+        Transaction tx = session.beginTransaction();
+        List emptyWarehouseProduct = session.createCriteria(WarehouseProduct.class).add(Restrictions.eq("quantity", quantity)).list();
+        tx.commit();
+        session.close();
+        return emptyWarehouseProduct;
     }
 
     /**
@@ -641,17 +619,14 @@ public final class mainframe extends javax.swing.JFrame implements Observer {
     private void jMenuItem1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jMenuItem1ActionPerformed
         String name = JOptionPane.showInputDialog(this, "Enter name for the new warehouse");
 
-        if (name != null) {
+        if (name == null) {
+            return;
+        }
 
-            Session session = NewHibernateUtil.getSessionFactory().openSession();
-            int retcode = Util.addWarehouse(session, name, this);
-
-            if (retcode < 0) {
-                JOptionPane.showMessageDialog(null, "Warehouse exists!");
-            } else {
-                JOptionPane.showMessageDialog(null, "Successfully added new warehouse.");
-            }
-            session.close();
+        if (Util.addWarehouse(name, this) < 0) {
+            JOptionPane.showMessageDialog(null, "Warehouse exists!");
+        } else {
+            JOptionPane.showMessageDialog(null, "Successfully added new warehouse.");
         }
     }//GEN-LAST:event_jMenuItem1ActionPerformed
 
@@ -736,21 +711,14 @@ public final class mainframe extends javax.swing.JFrame implements Observer {
 
     private void jMenuItem2ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jMenuItem2ActionPerformed
         int tabId = tab.getSelectedIndex();
-        if (tabId > 1) {
-
-            Session session = NewHibernateUtil.getSessionFactory().openSession();
-            Transaction tx = session.beginTransaction();
-
-            session.delete(panels.get(tabId - 2).getWarehouse());
-            tx.commit();
-            session.close();
-
-            tab.remove(tabId);
-            panels.remove(tabId - 2);
-
+        if (tabId <= 1) {
+            return;
         }
 
-
+        Warehouse warehouse = panels.get(tabId - 2).getWarehouse();
+        WarehouseDAO.delete(warehouse);
+        tab.remove(tabId);
+        panels.remove(tabId - 2);
     }//GEN-LAST:event_jMenuItem2ActionPerformed
 
     private void jMenuItem4ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jMenuItem4ActionPerformed
@@ -941,13 +909,9 @@ class TabTitleEditListener extends MouseAdapter implements ChangeListener {
             Warehouse wh = panels.get(editing_idx - 2).getWarehouse();
             wh.setName(title);
 
-            Session session = NewHibernateUtil.getSessionFactory().openSession();
-            Transaction tx = session.beginTransaction();
-            session.update(wh);
-            tx.commit();
-            session.close();
-
+            WarehouseDAO.update(wh);
         }
+
         cancelEditing();
         observable.changeData("refresh");
     }

@@ -5,29 +5,26 @@
  */
 package com.storage.mywarehouse;
 
+import com.storage.mywarehouse.Dao.ProductDAO;
+import com.storage.mywarehouse.Dao.QuantityHistoryViewDAO;
+import com.storage.mywarehouse.Dao.WarehouseDAO;
 import com.storage.mywarehouse.Entity.Product;
 import com.storage.mywarehouse.Entity.Warehouse;
-import com.storage.mywarehouse.Hibernate.NewHibernateUtil;
 import com.storage.mywarehouse.View.QuantityHistoryView;
+import org.apache.commons.csv.CSVFormat;
+import org.apache.commons.csv.CSVParser;
+import org.apache.commons.csv.CSVRecord;
+
 import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.nio.charset.StandardCharsets;
 import java.util.List;
-import java.util.Map;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-import org.apache.commons.csv.CSVFormat;
-import org.apache.commons.csv.CSVParser;
-import org.apache.commons.csv.CSVRecord;
-import org.hibernate.Session;
-import org.hibernate.Transaction;
-import org.hibernate.criterion.Order;
-import org.hibernate.criterion.Restrictions;
 
 /**
- *
  * @author bojan, Patroklos
  */
 public class Util {
@@ -42,52 +39,40 @@ public class Util {
 
     public static String parseProducts(File file) throws IOException {
         CSVParser csvParser = CSVParser.parse(file, StandardCharsets.UTF_8, CSVFormat.EXCEL.withHeader(ProductHeader.class));
-        Map<String, Integer> header = csvParser.getHeaderMap();
         int numberOfSuccessfulRows = 0;
         int numberOfFailedRows = 0;
-        Session session = NewHibernateUtil.getSessionFactory().openSession();
         for (CSVRecord record : csvParser.getRecords()) {
-            String brand = record.get(ProductHeader.BRAND);
-            String type = record.get(ProductHeader.TYPE);
-            String description = record.get(ProductHeader.DESCRIPTION);
-            double price = Double.parseDouble(record.get(ProductHeader.PRICE));
-            if ("".equals(brand) || "".equals(type)) {
+            Product product = parseProduct(record);
+            if (product == null) {
                 numberOfFailedRows++;
-                continue;
-            }
-            Transaction tx = session.beginTransaction();
-            Product existingProduct = (Product) session.createCriteria(Product.class).add(Restrictions.and(Restrictions.eq("brand", brand), Restrictions.eq("type", type))).uniqueResult();
-            tx.commit();
-            if (existingProduct != null) {
-                System.out.println("Product of brand " + brand + " and type " + type + " already exists!");
-                numberOfFailedRows++;
-                continue;
-            }
-            int productId;
-            tx = session.beginTransaction();
-            Product productWithHighestId = (Product) session.createCriteria(Product.class).addOrder(Order.desc("productId")).setMaxResults(1).uniqueResult();
-            tx.commit();
-            if (productWithHighestId == null) {
-                productId = 0;
             } else {
-                productId = productWithHighestId.getProductId() + 1;
+                numberOfSuccessfulRows++;
             }
-            Product p = new Product(productId, brand, type, description, price);
-            tx = session.beginTransaction();
-            session.save(p);
-            tx.commit();
-            numberOfSuccessfulRows++;
         }
-        session.close();
         return "Number of successfully inserted rows: " + numberOfSuccessfulRows + "\n Number of erronous rows: " + numberOfFailedRows;
+    }
+
+    private static Product parseProduct(CSVRecord record) {
+        String brand = record.get(ProductHeader.BRAND);
+        String type = record.get(ProductHeader.TYPE);
+        if ("".equals(brand) || "".equals(type)) {
+            return null;
+        }
+        if (ProductDAO.findByBrandAndName(brand, type) != null) {
+            System.out.println("Product of brand " + brand + " and type " + type + " already exists!");
+            return null;
+        }
+
+        String description = record.get(ProductHeader.DESCRIPTION);
+        double price = Double.parseDouble(record.get(ProductHeader.PRICE));
+        Product product = new Product(brand, type, description, price);
+        return ProductDAO.save(product);
     }
 
     public static String parseWarehouses(File file, mainframe frame) throws IOException {
         CSVParser csvParser = CSVParser.parse(file, StandardCharsets.UTF_8, CSVFormat.EXCEL.withHeader(WarehouseHeader.class));
-        Map<String, Integer> header = csvParser.getHeaderMap();
         int numberOfSuccessfulRows = 0;
         int numberOfFailedRows = 0;
-        Session session = NewHibernateUtil.getSessionFactory().openSession();
         for (CSVRecord record : csvParser.getRecords()) {
             String name = record.get(WarehouseHeader.NAME);
             if ("".equals(name)) {
@@ -95,66 +80,37 @@ public class Util {
                 continue;
             }
 
-            if (addWarehouse(session, name, frame) < 0) {
+            if (addWarehouse(name, frame) < 0) {
                 numberOfFailedRows++;
             } else {
                 numberOfSuccessfulRows++;
             }
 
         }
-        session.close();
         return "Number of successfully inserted rows: " + numberOfSuccessfulRows + "\n Number of erronous rows: " + numberOfFailedRows;
     }
-    
-    public static void exportQuantityHistory(File file){
-        PrintWriter out = null;
-            try {
-                Session session = NewHibernateUtil.getSessionFactory().openSession();
-                List q_history = session.createCriteria(QuantityHistoryView.class)
-                        .addOrder(Order.asc("warehouse"))
-                        .addOrder(Order.asc("brand"))
-                        .addOrder(Order.asc("type"))
-                        .addOrder(Order.asc("date"))
-                        .list();
-                session.close();
-                out = new PrintWriter(new FileWriter(file));
-                out.println("Warehouse\tBrand\tType\tDate\tQuantity");
-//                out.println("test");
-                for(QuantityHistoryView qhv : (List<QuantityHistoryView> )q_history){
-                    out.println(qhv.toString());
-                }
-//                out.close();
-            } catch (IOException ex) {
-                Logger.getLogger(mainframe.class.getName()).log(Level.SEVERE, null, ex);
-            } finally {
-                out.close();
+
+    public static void exportQuantityHistory(File file) {
+        try (PrintWriter out = new PrintWriter(new FileWriter(file))) {
+            out.println("Warehouse\tBrand\tType\tDate\tQuantity");
+            for (QuantityHistoryView qhv : QuantityHistoryViewDAO.findAll()) {
+                out.println(qhv.toString());
             }
+        } catch (IOException ex) {
+            Logger.getLogger(mainframe.class.getName()).log(Level.SEVERE, null, ex);
+        }
     }
 
-    public static int addWarehouse(Session session, String name, mainframe frame) {
-        List<storagepanel> panels = frame.getPanels();
-        Transaction tx = session.beginTransaction();
-        Warehouse existingWarehouse = (Warehouse) session.createCriteria(Warehouse.class).add(Restrictions.and(Restrictions.eq("name", name))).uniqueResult();
-        tx.commit();
-        if (existingWarehouse != null) {
+    public static int addWarehouse(String name, mainframe frame) {
+        if (WarehouseDAO.findByName(name) != null) {
             System.out.println("Warehouse " + name + " already exists!");
             return -1;
         }
-        tx = session.beginTransaction();
-        int warehouseId;
-        Warehouse withHighestId = (Warehouse) session.createCriteria(Warehouse.class).addOrder(Order.desc("warehouseId")).setMaxResults(1).uniqueResult();
-        tx.commit();
-        if (withHighestId == null) {
-            warehouseId = 0;
-        } else {
-            warehouseId = withHighestId.getWarehouseId() + 1;
-        }
-        Warehouse w = new Warehouse(warehouseId, name);
-        tx = session.beginTransaction();
 
-        session.save(w);
-        tx.commit();
+        Warehouse warehouse = new Warehouse(name);
+        Warehouse w = WarehouseDAO.save(warehouse);
 
+        List<storagepanel> panels = frame.getPanels();
         panels.add(new storagepanel(w, frame));
         frame.getWarehouses().add(w);
         frame.getTabs().add(name, panels.get(panels.size() - 1));
