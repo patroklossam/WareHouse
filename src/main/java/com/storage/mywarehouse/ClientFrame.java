@@ -5,16 +5,15 @@
  */
 package com.storage.mywarehouse;
 
+import com.storage.mywarehouse.Dao.CustomerDAO;
 import com.storage.mywarehouse.Entity.Customer;
-import com.storage.mywarehouse.Hibernate.NewHibernateUtil;
+
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.Iterator;
 import java.util.List;
 import javax.swing.JOptionPane;
 import javax.swing.table.DefaultTableModel;
-import org.hibernate.Session;
-import org.hibernate.Transaction;
 
 /**
  *
@@ -203,13 +202,7 @@ public final class ClientFrame extends javax.swing.JFrame {
 
             Customer c = (Customer) customers.get(row);
             customers.remove(c);
-
-            Session session = NewHibernateUtil.getSessionFactory().openSession();
-            Transaction tx = session.beginTransaction();
-
-            session.delete(c);
-            tx.commit();
-            session.close();
+            CustomerDAO.delete(c);
             observable.changeData("refresh_clients");
         } else {
             JOptionPane.showMessageDialog(this, "First click on the row you want to delete.");

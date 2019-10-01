@@ -5,15 +5,11 @@
  */
 package com.storage.mywarehouse;
 
+import com.storage.mywarehouse.Dao.CustomerDAO;
 import com.storage.mywarehouse.Entity.Customer;
-import com.storage.mywarehouse.Entity.Product;
-import com.storage.mywarehouse.Hibernate.NewHibernateUtil;
+
 import java.awt.Component;
-import java.util.List;
 import javax.swing.JOptionPane;
-import org.hibernate.Session;
-import org.hibernate.Transaction;
-import org.hibernate.criterion.Order;
 
 /**
  *
@@ -22,7 +18,7 @@ import org.hibernate.criterion.Order;
 public class clientForm extends javax.swing.JFrame {
 
     private final MyObservable observable = new MyObservable();
-    private boolean update = false;
+    private boolean update;
     private Customer customer;
 
     /**
@@ -31,6 +27,7 @@ public class clientForm extends javax.swing.JFrame {
      * @param frame for use in observer
      */
     public clientForm(mainframe frame) {
+        this.customer = new Customer();
         update = false;
         observable.addObserver(frame);
         Globals.ClientsFrame = true;
@@ -194,30 +191,11 @@ public class clientForm extends javax.swing.JFrame {
     }// </editor-fold>//GEN-END:initComponents
 
     private void jButton1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton1ActionPerformed
-
-        Session session = NewHibernateUtil.getSessionFactory().openSession();
-        customer = new Customer();
-        Transaction tx = null;
-
-        if (!update) {
-            tx = session.beginTransaction();
-            int nextId = 0;
-            
-            Customer customerWithHighestId = (Customer) session.createCriteria(Customer.class).addOrder(Order.desc("customerId")).setMaxResults(1).uniqueResult();
-            tx.commit();
-            if (customerWithHighestId == null) {
-                nextId = 0;
-            } else {
-                nextId = customerWithHighestId.getCustomerId() + 1;
-            }
-            
-            customer.setCustomerId(nextId);
-        }
-
         String cName = "";
         String cLastName = "";
         String full_job;
         double full_dc;
+
         if (clientSurname.getText().length() > 0) {
             cLastName += clientSurname.getText();
         }
@@ -240,14 +218,11 @@ public class clientForm extends javax.swing.JFrame {
         customer.setOccupation(full_job);
         customer.setDiscount(full_dc);
 
-        tx = session.beginTransaction();
         if (update) {
-            session.update(customer);
+            CustomerDAO.update(customer);
         } else {
-            session.save(customer);
+            CustomerDAO.save(customer);
         }
-        tx.commit();
-        session.close();
 
         observable.changeData("refresh_clients");
         if (update) {
@@ -257,7 +232,6 @@ public class clientForm extends javax.swing.JFrame {
         }
         Globals.ClientsFrame = false;
         dispose();
-
     }//GEN-LAST:event_jButton1ActionPerformed
 
     private void jButton2ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton2ActionPerformed

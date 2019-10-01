@@ -6,16 +6,14 @@
  */
 package com.storage.mywarehouse;
 
+import com.storage.mywarehouse.Dao.CustomerDAO;
 import com.storage.mywarehouse.Dao.WarehouseDAO;
 import com.storage.mywarehouse.Dao.WarehouseProductDAO;
 import com.storage.mywarehouse.Entity.Customer;
 import com.storage.mywarehouse.Entity.Warehouse;
-import com.storage.mywarehouse.Hibernate.NewHibernateUtil;
 import com.storage.mywarehouse.View.WarehouseProduct;
 import org.apache.commons.collections.primitives.ArrayDoubleList;
 import org.apache.commons.collections.primitives.DoubleList;
-import org.hibernate.Session;
-import org.hibernate.Transaction;
 
 import javax.swing.*;
 import javax.swing.event.ChangeEvent;
@@ -80,7 +78,7 @@ public final class mainframe extends javax.swing.JFrame implements Observer {
         customer_dc.add(0.0);
         clientCombo.addItem("Select Customer");
 
-        this.customers = findAllCustomers();
+        this.customers = CustomerDAO.findAll();
 
         if (Globals.ClientsFrame) {
             clframe.refreshClients(this.customers);
@@ -97,15 +95,6 @@ public final class mainframe extends javax.swing.JFrame implements Observer {
             clientCombo.addItem(cust.getLastName() + " - " + cust.getName());
         }
 
-    }
-
-    private List findAllCustomers() {
-        Session session = NewHibernateUtil.getSessionFactory().openSession();
-        Transaction tx = session.beginTransaction();
-        List customers = session.createCriteria(Customer.class).list();
-        tx.commit();
-        session.close();
-        return customers;
     }
 
     public mainframe() {
