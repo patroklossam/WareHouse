@@ -34,4 +34,14 @@ public class WarehouseTest {
             () -> assertEquals(ANY, sut.getName()),
             () -> assertEquals(ONE, sut.getWarehouseId()));
     }
+
+    @Test
+    public void testConstructors2() {
+        sut = new Warehouse(ONE, ANY);
+
+        assertEquals(ANY, sut.getName());
+
+        assertAll("test constructor with no warehouse id",
+            () -> assertEquals(ANY, sut.getName()));
+    }
 }

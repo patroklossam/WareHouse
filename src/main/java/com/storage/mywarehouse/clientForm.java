@@ -49,6 +49,10 @@ public class clientForm extends javax.swing.JFrame {
 
         clientName.setText(customer.getName());
         clientSurname.setText(customer.getLastName());
+        email.setText(customer.getEmail());
+        postal.setText(customer.getPostal());
+        city.setText(customer.getCity());
+        telephone.setText(customer.getTelephone());
         clientJob.setText(customer.getOccupation());
         discount.setText("" + customer.getDiscount());
 
@@ -68,8 +72,16 @@ public class clientForm extends javax.swing.JFrame {
         jLabel30 = new javax.swing.JLabel();
         clientName = new javax.swing.JTextField();
         clientSurname = new javax.swing.JTextField();
+        email = new javax.swing.JTextField();
+        postal = new javax.swing.JTextField();
+        city = new javax.swing.JTextField();
+        telephone = new javax.swing.JTextField();
         jLabel35 = new javax.swing.JLabel();
         jLabel38 = new javax.swing.JLabel();
+        jLabelEmail = new javax.swing.JLabel();
+        jLabelPostal = new javax.swing.JLabel();
+        jLabelCity = new javax.swing.JLabel();
+        jLabelTelephone = new javax.swing.JLabel();
         clientJob = new javax.swing.JTextField();
         jLabel62 = new javax.swing.JLabel();
         discount = new javax.swing.JTextField();
@@ -84,6 +96,14 @@ public class clientForm extends javax.swing.JFrame {
         jLabel30.setText("First Name");
 
         jLabel35.setText("Last name");
+
+        jLabelEmail.setText("Email");
+
+        jLabelPostal.setText("Postal");
+
+        jLabelCity.setText("City");
+
+        jLabelTelephone.setText("Telephone");
 
         jLabel38.setText("Occupation");
 
@@ -129,11 +149,19 @@ public class clientForm extends javax.swing.JFrame {
                                 .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                                     .addComponent(jLabel30, javax.swing.GroupLayout.Alignment.TRAILING)
                                     .addComponent(jLabel35, javax.swing.GroupLayout.Alignment.TRAILING)
+                                    .addComponent(jLabelEmail, javax.swing.GroupLayout.Alignment.TRAILING)
+                                    .addComponent(jLabelPostal, javax.swing.GroupLayout.Alignment.TRAILING)
+                                    .addComponent(jLabelCity, javax.swing.GroupLayout.Alignment.TRAILING)
+                                    .addComponent(jLabelTelephone, javax.swing.GroupLayout.Alignment.TRAILING)
                                     .addComponent(jLabel38, javax.swing.GroupLayout.Alignment.TRAILING))
                                 .addGap(13, 13, 13)
                                 .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING, false)
                                     .addComponent(clientSurname, javax.swing.GroupLayout.Alignment.LEADING, javax.swing.GroupLayout.DEFAULT_SIZE, 223, Short.MAX_VALUE)
                                     .addComponent(clientName, javax.swing.GroupLayout.Alignment.LEADING)
+                                    .addComponent(email, javax.swing.GroupLayout.Alignment.LEADING)
+                                    .addComponent(postal, javax.swing.GroupLayout.Alignment.LEADING)
+                                    .addComponent(city, javax.swing.GroupLayout.Alignment.LEADING)
+                                    .addComponent(telephone, javax.swing.GroupLayout.Alignment.LEADING)
                                     .addComponent(clientJob)))
                             .addGroup(jPanel1Layout.createSequentialGroup()
                                 .addGap(49, 49, 49)
@@ -156,6 +184,22 @@ public class clientForm extends javax.swing.JFrame {
                 .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                     .addComponent(jLabel30)
                     .addComponent(clientName, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                    .addComponent(jLabelEmail)
+                    .addComponent(email, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                    .addComponent(jLabelPostal)
+                    .addComponent(postal, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                    .addComponent(jLabelCity)
+                    .addComponent(city, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                    .addComponent(jLabelTelephone)
+                    .addComponent(telephone, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                     .addComponent(jLabel35)
@@ -193,11 +237,27 @@ public class clientForm extends javax.swing.JFrame {
     private void jButton1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton1ActionPerformed
         String cName = "";
         String cLastName = "";
+        String cEmial = "";
+        String cPostal = "";
+        String cCity = "";
+        String cTelephone = "";
         String full_job;
         double full_dc;
 
         if (clientSurname.getText().length() > 0) {
             cLastName += clientSurname.getText();
+        }
+        if (email.getText().length() > 0) {
+            cEmial += email.getText();
+        }
+        if (postal.getText().length() > 0) {
+            cPostal += postal.getText();
+        }
+        if (city.getText().length() > 0) {
+            cCity += city.getText();
+        }
+        if (telephone.getText().length() > 0) {
+            cTelephone += telephone.getText();
         }
         if (clientName.getText().length() > 0) {
             cName += clientName.getText();
@@ -217,6 +277,10 @@ public class clientForm extends javax.swing.JFrame {
         customer.setLastName(cLastName);
         customer.setOccupation(full_job);
         customer.setDiscount(full_dc);
+        customer.setEmail(cEmial);
+        customer.setPostal(cPostal);
+        customer.setCity(cCity);
+        customer.setTelephone(cTelephone);
 
         if (update) {
             CustomerDAO.update(customer);
@@ -247,6 +311,10 @@ public class clientForm extends javax.swing.JFrame {
     private javax.swing.JTextField clientJob;
     private javax.swing.JTextField clientName;
     private javax.swing.JTextField clientSurname;
+    private javax.swing.JTextField email;
+    private javax.swing.JTextField postal;
+    private javax.swing.JTextField city;
+    private javax.swing.JTextField telephone;
     private javax.swing.JTextField discount;
     private javax.swing.JButton jButton1;
     private javax.swing.JButton jButton2;
@@ -254,6 +322,10 @@ public class clientForm extends javax.swing.JFrame {
     private javax.swing.JLabel jLabel2;
     private javax.swing.JLabel jLabel30;
     private javax.swing.JLabel jLabel35;
+    private javax.swing.JLabel jLabelEmail;
+    private javax.swing.JLabel jLabelPostal;
+    private javax.swing.JLabel jLabelCity;
+    private javax.swing.JLabel jLabelTelephone;
     private javax.swing.JLabel jLabel38;
     private javax.swing.JLabel jLabel62;
     private javax.swing.JPanel jPanel1;

@@ -33,13 +33,17 @@ public class CustomerTest {
 
     @Test
     public void testConstructor() {
-        sut = new Customer(ONE, ANY, ANY, ANY, DOUBLE_VAL);
+        sut = new Customer(ONE, ANY, ANY, ANY, DOUBLE_VAL, ANY, ANY, ANY, ANY);
 
         assertAll("test constructor",
             () -> assertEquals(ONE, sut.getCustomerId()),
             () -> assertEquals(ANY, sut.getName()),
             () -> assertEquals(ANY, sut.getLastName()),
             () -> assertEquals(ANY, sut.getOccupation()),
-            () -> assertEquals(DOUBLE_VAL, sut.getDiscount(), 0.01));
+            () -> assertEquals(DOUBLE_VAL, sut.getDiscount(), 0.01),
+            () -> assertEquals(ANY, sut.getEmail()),
+            () -> assertEquals(ANY, sut.getPostal()),
+            () -> assertEquals(ANY, sut.getCity()),
+            () -> assertEquals(ANY, sut.getTelephone()));
     }
 }
