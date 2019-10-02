@@ -41,4 +41,16 @@ public class EntryTest {
             () -> assertEquals(ONE, sut.getProductId()),
             () -> assertEquals(ONE, sut.getQuantity()));
     }
+ 
+    @Test
+    public void testConstructor2() {
+        // given when
+        Entry sut = new Entry(ONE, ONE, ONE);
+
+        // then
+        assertAll("test constructor with no entry id",
+            () -> assertEquals(ONE, sut.getWarehouseId()),
+            () -> assertEquals(ONE, sut.getProductId()),
+            () -> assertEquals(ONE, sut.getQuantity()));
+    }
 }
