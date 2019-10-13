@@ -22,12 +22,20 @@ public class CustomerTest {
         sut.setLastName(ANY);
         sut.setOccupation(ANY);
         sut.setDiscount(DOUBLE_VAL);
+        sut.setEmail(ANY);
+        sut.setCity(ANY);
+        sut.setPostal(ANY);
+        sut.setTelephone(ANY);
 
         assertAll("test setter getter",
             () -> assertEquals(ONE, sut.getCustomerId()),
             () -> assertEquals(ANY, sut.getName()),
             () -> assertEquals(ANY, sut.getLastName()),
             () -> assertEquals(ANY, sut.getOccupation()),
+            () -> assertEquals(ANY, sut.getEmail()),
+            () -> assertEquals(ANY, sut.getCity()),
+            () -> assertEquals(ANY, sut.getPostal()),
+            () -> assertEquals(ANY, sut.getTelephone()),
             () -> assertEquals(DOUBLE_VAL, sut.getDiscount(), 0.01));
     }
 
