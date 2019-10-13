@@ -14,18 +14,28 @@ public class Customer  implements java.io.Serializable {
      private String lastName;
      private String occupation;
      private double discount;
+     private String email;
+     private String city;
+     private String postal;
+     private String telephone;
+
 
     public Customer() {
     }
 
-    public Customer(int customerId, String name, String lastName, String occupation, double discount) {
-       this.customerId = customerId;
-       this.name = name;
-       this.lastName = lastName;
-       this.occupation = occupation;
-       this.discount = discount;
+    public Customer(int customerId, String name, String lastName, String occupation, double discount,
+                    String email, String city, String postal, String telephone) {
+        this.customerId = customerId;
+        this.name = name;
+        this.lastName = lastName;
+        this.occupation = occupation;
+        this.discount = discount;
+        this.email = email;
+        this.city = city;
+        this.postal = postal;
+        this.telephone = telephone;
     }
-   
+
     public int getCustomerId() {
         return this.customerId;
     }
@@ -62,9 +72,37 @@ public class Customer  implements java.io.Serializable {
         this.discount = discount;
     }
 
+    public String getEmail() {
+        return email;
+    }
 
+    public void setEmail(String email) {
+        this.email = email;
+    }
 
+    public String getCity() {
+        return city;
+    }
 
+    public void setCity(String city) {
+        this.city = city;
+    }
+
+    public String getPostal() {
+        return postal;
+    }
+
+    public void setPostal(String postal) {
+        this.postal = postal;
+    }
+
+    public String getTelephone() {
+        return telephone;
+    }
+
+    public void setTelephone(String telephone) {
+        this.telephone = telephone;
+    }
 }
 
 

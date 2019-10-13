@@ -19,5 +19,18 @@
     <property name="discount" type="double">
       <column name="Discount" not-null="true" precision="2000000000" scale="10"/>
     </property>
+    <property name="email" type="string">
+      <column length="200000" name="`Email`" not-null="true"/>
+    </property>
+    <property name="postal" type="string">
+      <column length="200000" name="`Postal`" not-null="false"/>
+    </property>
+    <property name="city" type="string">
+      <column length="2000000000" name="`City`" not-null="false"/>
+    </property>
+    <property name="telephone" type="string">
+      <column length="200000" name="`Telephone`" not-null="false"/>
+    </property>
+
   </class>
 </hibernate-mapping>
