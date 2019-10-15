@@ -1,5 +1,12 @@
 codecov:
         require_ci_to_pass: yes
 ignore:
-        - src/main/java/com/storage/mywarehouse/*
-
+        - src/main/java/com/storage/mywarehouse/clientForm.java
+        - src/main/java/com/storage/mywarehouse/ClientFrame.java
+        - src/main/java/com/storage/mywarehouse/Globals.java
+        - src/main/java/com/storage/mywarehouse/home.java
+        - src/main/java/com/storage/mywarehouse/mainframe.java
+        - src/main/java/com/storage/mywarehouse/MyObservable.java
+        - src/main/java/com/storage/mywarehouse/ProductForm.java
+        - src/main/java/com/storage/mywarehouse/storagepanel.java
+        - src/main/java/com/storage/mywarehouse/Util.java
