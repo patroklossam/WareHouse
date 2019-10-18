@@ -11,6 +11,8 @@ import com.storage.mywarehouse.Entity.Entry;
 import com.storage.mywarehouse.Entity.Product;
 import com.storage.mywarehouse.Entity.Warehouse;
 import com.storage.mywarehouse.View.WarehouseEntry;
+
+import java.awt.event.ActionEvent;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Iterator;
@@ -21,6 +23,8 @@ import javax.swing.event.ChangeEvent;
 import javax.swing.table.DefaultTableModel;
 import org.apache.commons.collections.primitives.ArrayIntList;
 import org.apache.commons.collections.primitives.IntList;
+
+import static com.storage.mywarehouse.Dao.EntryDAO.isProductDuplicate;
 
 /**
  *
@@ -139,6 +143,7 @@ public class storagepanel extends javax.swing.JPanel {
             tableModel.addRow(new Object[]{we.getProductId(), we.getBrand(), we.getType(), we.getQuantity(), we.getPrice()});
         }
     }
+
 
     /**
      * This method is called from within the constructor to initialize the form.
@@ -261,10 +266,33 @@ public class storagepanel extends javax.swing.JPanel {
         int prodId = Integer.parseInt(selectedProduct.substring(selectedProduct.lastIndexOf('_') + 1));
 
         int warehouseId = this.st_id;
-        Entry e = EntryDAO.save(new Entry(warehouseId, prodId, 0));
-        Product pr = ProductDAO.findById(prodId);
-        tableModel.addRow(new Object[]{pr.getProductId(), pr.getBrand(), pr.getType(), 0, pr.getPrice()});
-        rows_entry.add(e);
+
+        boolean isProductDuplicate=isProductDuplicate(warehouseId,prodId);
+        if(isProductDuplicate){
+
+            String productQuantity=JOptionPane.showInputDialog(this,"The product already exists." +
+                            "\n please enter quantity.",
+                            "Update Product",
+                            JOptionPane.INFORMATION_MESSAGE);
+
+            Entry existingProduct=EntryDAO.findProductInWarehouse(warehouseId,prodId).get(0);
+            int currentQuantity=existingProduct.getQuantity() + Integer.valueOf(productQuantity);
+            existingProduct.setQuantity(currentQuantity);
+            EntryDAO.update(existingProduct);
+            for (int k = 0; k < tableModel.getRowCount(); k++) {
+                if (k == existingProduct.getProductId()) {
+                    tableModel.setValueAt(currentQuantity,k,3);
+                }
+            }
+
+        }
+        else {
+            Entry e = EntryDAO.save(new Entry(warehouseId, prodId, 0));
+            Product pr = ProductDAO.findById(prodId);
+            tableModel.addRow(new Object[]{pr.getProductId(), pr.getBrand(), pr.getType(), 0, pr.getPrice()});
+            rows_entry.add(e);
+        }
+
     }//GEN-LAST:event_jButton1ActionPerformed
 
     private void jTable1KeyTyped(java.awt.event.KeyEvent evt) {//GEN-FIRST:event_jTable1KeyTyped
