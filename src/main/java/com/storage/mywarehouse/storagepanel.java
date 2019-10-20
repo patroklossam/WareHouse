@@ -17,7 +17,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
-import javax.swing.JOptionPane;
+import javax.swing.*;
 import javax.swing.event.CellEditorListener;
 import javax.swing.event.ChangeEvent;
 import javax.swing.table.DefaultTableModel;
@@ -255,7 +255,9 @@ public class storagepanel extends javax.swing.JPanel {
             i++;
         }
 
-        String selectedProduct = (String) JOptionPane.showInputDialog(this,
+        String selectedProduct =
+
+                (String) JOptionPane.showInputDialog(this,
                 "PLease select your Product?",
                 "Product:",
                 JOptionPane.QUESTION_MESSAGE,
@@ -287,9 +289,12 @@ public class storagepanel extends javax.swing.JPanel {
 
         }
         else {
-            Entry e = EntryDAO.save(new Entry(warehouseId, prodId, 0));
+            String productQuantity=JOptionPane.showInputDialog(this,"please enter quantity: ",
+                    "Product Quantity",
+                    JOptionPane.INFORMATION_MESSAGE);
+            Entry e = EntryDAO.save(new Entry(warehouseId, prodId,Integer.valueOf(productQuantity)));
             Product pr = ProductDAO.findById(prodId);
-            tableModel.addRow(new Object[]{pr.getProductId(), pr.getBrand(), pr.getType(), 0, pr.getPrice()});
+            tableModel.addRow(new Object[]{pr.getProductId(), pr.getBrand(), pr.getType(), e.getQuantity(), pr.getPrice()});
             rows_entry.add(e);
         }
 
