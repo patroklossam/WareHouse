@@ -1,12 +1,17 @@
 package com.storage.mywarehouse.Dao;
 
 import com.storage.mywarehouse.Entity.Entry;
+import com.storage.mywarehouse.Entity.Product;
 import org.hibernate.Session;
 import org.hibernate.Transaction;
+import org.hibernate.criterion.MatchMode;
 import org.hibernate.criterion.Order;
 import org.hibernate.criterion.Restrictions;
 
 import java.util.List;
+
+import static org.hibernate.criterion.Restrictions.and;
+import static org.hibernate.criterion.Restrictions.eq;
 
 public class EntryDAO {
     @SuppressWarnings("unchecked")
@@ -43,4 +48,47 @@ public class EntryDAO {
         tx.commit();
         session.close();
     }
+
+    public static boolean isProductDuplicate(int warehouseId,int productId){
+
+        Session session = NewHibernateUtil.getSessionFactory().openSession();
+        List <Entry> entries = session.createCriteria(Entry.class).
+                add(and(eq("productId", productId))).
+                                add(and(eq("warehouseId",warehouseId)))
+                .list();
+        session.close();
+        if(entries!=null){
+            if(entries.size()>0) {
+                return true;
+            }
+        }
+
+        return false;
+
+
+    }
+
+    public static List<Entry> findProductInWarehouse(int warehouseId,int productId){
+
+        Session session = NewHibernateUtil.getSessionFactory().openSession();
+        List <Entry> entries = session.createCriteria(Entry.class).
+                add(and(eq("productId", productId))).
+                add(and(eq("warehouseId",warehouseId)))
+                .list();
+        session.close();
+        return entries;
+
+    }
+
+
+    public static void update(Entry entry){
+
+        Session session=NewHibernateUtil.getSessionFactory().openSession();
+        Transaction tx=session.beginTransaction();
+        session.update(entry);
+        tx.commit();
+        session.close();
+    }
+
+
 }

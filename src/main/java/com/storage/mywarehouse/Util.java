@@ -53,6 +53,7 @@ public class Util {
     }
 
     private static Product parseProduct(CSVRecord record) {
+
         String brand = record.get(ProductHeader.BRAND);
         String type = record.get(ProductHeader.TYPE);
         if ("".equals(brand) || "".equals(type)) {
