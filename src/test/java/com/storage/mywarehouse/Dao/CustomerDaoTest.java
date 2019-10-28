@@ -43,9 +43,12 @@ public class CustomerDaoTest {
             () -> assertEquals(ANY, rets.get(0).getName()),
             () -> assertEquals(ANY2, rets.get(1).getLastName()));
 
+	CustomerDAO.delete(sut1);
+	rets = CustomerDAO.findAll();
+	assertEquals(ONE, rets.size());
+
 	CustomerDAO.deleteAll(CustomerDAO.findAll());
 	rets = CustomerDAO.findAll();
-
 	assertEquals(ZERO, rets.size());
     }
 

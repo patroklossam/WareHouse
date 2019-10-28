@@ -47,6 +47,11 @@ public class WarehouseDaoTest {
             () -> assertEquals(ONE, WarehouseDAO.findByName(ANY2).getWarehouseId()),
             () -> assertEquals(ZERO, WarehouseDAO.findByName(ANY).getWarehouseId()),
             () -> assertEquals(TWO, WarehouseDAO.findByName(ANY3).getWarehouseId()));
+	
+	WarehouseDAO.delete(sut2);
+	rets = WarehouseDAO.findAll();
+
+	assertEquals(TWO, rets.size());
 
 	WarehouseDAO.deleteAll(WarehouseDAO.findAll());
 	rets = WarehouseDAO.findAll();
