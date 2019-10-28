@@ -37,7 +37,7 @@ public class WarehouseTest {
 
     @Test
     public void testConstructors2() {
-        sut = new Warehouse(ONE, ANY);
+        sut = new Warehouse(ANY);
 
         assertEquals(ANY, sut.getName());
 
