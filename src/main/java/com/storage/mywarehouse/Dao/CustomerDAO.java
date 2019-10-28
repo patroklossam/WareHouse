@@ -49,4 +49,14 @@ public class CustomerDAO {
         tx.commit();
         session.close();
     }
+
+    public static void deleteAll(List<Customer> customers) {
+        Session session = NewHibernateUtil.getSessionFactory().openSession();
+        Transaction tx = session.beginTransaction();
+        for (Customer c : customers) {
+            session.delete(c);
+        }
+        tx.commit();
+        session.close();
+    }
 }

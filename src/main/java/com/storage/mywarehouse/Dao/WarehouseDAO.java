@@ -68,4 +68,14 @@ public class WarehouseDAO {
         tx.commit();
         session.close();
     }
+
+    public static void deleteAll(List<Warehouse> warehouses) {
+        Session session = NewHibernateUtil.getSessionFactory().openSession();
+        Transaction tx = session.beginTransaction();
+        for (Warehouse w : warehouses) {
+            session.delete(w);
+        }
+        tx.commit();
+        session.close();
+    }
 }
