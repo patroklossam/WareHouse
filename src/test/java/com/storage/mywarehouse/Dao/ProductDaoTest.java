@@ -19,7 +19,6 @@ public class ProductDaoTest {
     private static final double DOUBLE_VAL = 1.1;
     private Product sut1;
     private Product sut2;
-    private Product ret1;
     private List<Product> rets;
 
     @AfterEach
@@ -32,10 +31,10 @@ public class ProductDaoTest {
         sut1 = new Product(ONE, ANY, ANY, DOUBLE_VAL);
         sut2 = new Product(TWO, ANY2, ANY2, DOUBLE_VAL);
 
-        Product.save(sut1);
-        Product.save(sut2);
+        ProductDAO.save(sut1);
+        ProductDAO.save(sut2);
 
-        rets = Product.findAll();
+        rets = ProductDAO.findAll();
 
         assertAll("test if products are saved",
                 () -> assertEquals(TWO, rets.size()),
@@ -49,23 +48,5 @@ public class ProductDaoTest {
         ProductDAO.deleteAll(ProductDAO.findAll());
         rets = ProductDAO.findAll();
         assertEquals(ZERO, rets.size());
-    }
-
-    @Test
-    public void testUpdate() {
-        sut1 = new Product(ONE, ANY, ANY, DOUBLE_VAL);
-        ProductDAO.save(sut1);
-        rets = ProductDAO.findAll();
-
-        ret1 = rets.get(0);
-        assertEquals(ANY, ret1.getBrand());
-
-        sut1.setBrand(ANY2);
-        ProductDAO.update(sut1);
-
-        rets = ProductDAO.findAll();
-        ret1 = rets.get(0);
-
-        assertEquals(ANY2, ret1.getBrand());
     }
 }
