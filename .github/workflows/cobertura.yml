@@ -35,7 +35,7 @@ jobs:
           
       
       - name: codecoc-upload
-      - uses: codecov/codecov-action@v2
+        uses: codecov/codecov-action@v2
         with:
           files: ./coverage.xml
           flags: unittests # optional
