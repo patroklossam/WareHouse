@@ -49,16 +49,4 @@ public class ProductDaoTest {
         rets = ProductDAO.findAll();
         assertEquals(ZERO, rets.size());
     }
-
-    @Test
-    public void testFindById() {
-
-        sut1 = new Product(TWO, ANY2, ANY2, DOUBLE_VAL);
-        ProductDAO.save(sut1);
-
-        sut2 = ProductDAO.findById(TWO);
-        assertEquals(ANY2, sut2.getBrand());
-        
-    }
-
 }
