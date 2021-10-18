@@ -36,13 +36,13 @@ public class WarehouseProductDaoTest {
         w1 = new Warehouse(ANY);
         WarehouseDAO.save(w1);
 
-        p1 = new Product(ONE, ANY, ANY, DOUBLE_VAL);
-        p2 = new Product(TWO, ANY2, ANY2, DOUBLE_VAL);
+        p1 = new Product(ZERO, ANY, ANY, DOUBLE_VAL);
+        p2 = new Product(ONE, ANY2, ANY2, DOUBLE_VAL);
         ProductDAO.save(p1);
         ProductDAO.save(p2);
 
-        e1 = new Entry(ZERO, ONE, ONE, TWO);
-        e2 = new Entry(ONE, ONE, TWO, THREE);
+        e1 = new Entry(ZERO, ZERO, ZERO, TWO);
+        e2 = new Entry(ONE, ZERO, ONE, THREE);
 
         EntryDAO.save(e1);
         EntryDAO.save(e2);
@@ -58,7 +58,7 @@ public class WarehouseProductDaoTest {
     @Test
     public void testSaveNFindAllNDeleteAll() {
         
-        rets = WarehouseProductDAO.findById(ONE);
+        rets = WarehouseProductDAO.findById(ZERO);
         assertEquals(ONE, rets.size());
         assertEquals(ANY, rets.get(0).getBrand());
         
