@@ -48,6 +48,27 @@ public class EntryDAO {
         tx.commit();
         session.close();
     }
+    
+    
+    @SuppressWarnings("unchecked")
+    public static List<Entry> findAll() {
+        Session session = NewHibernateUtil.getSessionFactory().openSession();
+        Transaction tx = session.beginTransaction();
+        List entries = session.createCriteria(Entry.class).list();
+        tx.commit();
+        session.close();
+        return entries;
+    }
+
+    public static void deleteAll(List<Entry> entries) {
+        Session session = NewHibernateUtil.getSessionFactory().openSession();
+        Transaction tx = session.beginTransaction();
+        for (Entry e : entries) {
+            session.delete(e);
+        }
+        tx.commit();
+        session.close();
+    }
 
     public static boolean isProductDuplicate(int warehouseId,int productId){
 
