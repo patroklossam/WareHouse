@@ -32,10 +32,10 @@ public class ProductDaoTest {
         sut1 = new Product(ONE, ANY, ANY, DOUBLE_VAL);
         sut2 = new Product(TWO, ANY2, ANY2, DOUBLE_VAL);
 
-        Product.save(sut1);
-        Product.save(sut2);
+        ProductDAO.save(sut1);
+        ProductDAO.save(sut2);
 
-        rets = Product.findAll();
+        rets = ProductDAO.findAll();
 
         assertAll("test if products are saved",
                 () -> assertEquals(TWO, rets.size()),
