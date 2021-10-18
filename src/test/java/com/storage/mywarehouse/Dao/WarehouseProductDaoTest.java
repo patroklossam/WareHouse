@@ -6,6 +6,7 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertAll;
 
 import com.storage.mywarehouse.Entity.Warehouse;
+import com.storage.mywarehouse.View.WarehouseEntry;
 import com.storage.mywarehouse.View.WarehouseProduct;
 import java.util.List;
 
@@ -29,6 +30,7 @@ public class WarehouseProductDaoTest {
     private Entry e1;
     private Entry e2;
     private List<WarehouseProduct> rets;
+    private List<WarehouseEntry> rets2;
 
     
     @BeforeEach
@@ -72,5 +74,11 @@ public class WarehouseProductDaoTest {
         
         rets = WarehouseProductDAO.findByParamContainingValue("Brand", ANY);
         assertEquals(TWO, rets.size());
+        
+        
+        rets2 = WarehouseEntryDAO.findByWarehouseId(ZERO);
+        assertEquals(TWO, rets.size());
+        assertEquals(ANY, rets.get(0).getBrand());
+        
     }
 }
