@@ -19,6 +19,7 @@ public class ProductDaoTest {
     private static final double DOUBLE_VAL = 1.1;
     private Product sut1;
     private Product sut2;
+    private Product res1;
     private List<Product> rets;
 
     @AfterEach
@@ -28,8 +29,8 @@ public class ProductDaoTest {
 
     @Test
     public void testSaveNFindAllNDeleteAll() {
-        sut1 = new Product(ONE, ANY, ANY, DOUBLE_VAL);
-        sut2 = new Product(TWO, ANY2, ANY2, DOUBLE_VAL);
+        sut1 = new Product(ZERO, ANY, ANY, DOUBLE_VAL);
+        sut2 = new Product(ONE, ANY2, ANY2, DOUBLE_VAL);
 
         ProductDAO.save(sut1);
         ProductDAO.save(sut2);
@@ -44,7 +45,10 @@ public class ProductDaoTest {
         ProductDAO.delete(sut1);
         rets = ProductDAO.findAll();
         assertEquals(ONE, rets.size());
-
+        
+        res1 = ProductDAO.findById(ONE);
+        assertEquals(ANY2, res1.getBrand());
+        
         ProductDAO.deleteAll(ProductDAO.findAll());
         rets = ProductDAO.findAll();
         assertEquals(ZERO, rets.size());
