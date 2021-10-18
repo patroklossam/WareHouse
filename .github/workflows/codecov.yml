@@ -22,10 +22,12 @@ jobs:
 
     # Steps represent a sequence of tasks that will be executed as part of the job
     steps:
-      # Checks-out your repository under $GITHUB_WORKSPACE, so your job can access it
-      - uses: actions/checkout@v2
-          
-      - name: Codecov Node
-        # You may pin to the exact commit or the version.
-        # uses: iansu/codecov-action-node@a3174bedb5cd1a1439216391fe8a56ce97407172
-        uses: iansu/codecov-action-node@v1.0.1
+      - uses: actions/checkout@master
+      - uses: codecov/codecov-action@v2
+        with:
+          directory: ./coverage/reports/
+          files: ./coverage1.xml,./coverage2.xml # optional
+          flags: unittests # optional
+          name: codecov-umbrella # optional
+          fail_ci_if_error: true # optional (default = false)
+          verbose: true # optional (default = false)
