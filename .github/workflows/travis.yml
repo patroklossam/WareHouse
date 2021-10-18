@@ -27,5 +27,5 @@ jobs:
         # uses: ktomk/run-travis-yml@fab26d29082e009f43121c9e922be2555fa0a5cb
         uses: ktomk/run-travis-yml@v1.7.0
         with: 
-          file: /.travis.yml
+          file:
           allow-failure: false
