@@ -1,4 +1,4 @@
-[![Build Status](https://travis-ci.org/patroklossam/WareHouse.svg?branch=master)](https://travis-ci.org/patroklossam/WareHouse)
+![Build Status](https://github.com/patroklossam/WareHouse/actions/workflows/build.yml/badge.svg)
 [![codecov](https://codecov.io/gh/patroklossam/WareHouse/branch/master/graph/badge.svg)](https://codecov.io/gh/patroklossam/WareHouse)
 
 # WareHouse
