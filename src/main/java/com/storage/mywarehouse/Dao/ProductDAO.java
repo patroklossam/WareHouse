@@ -89,4 +89,12 @@ public class ProductDAO {
         transaction.commit();
         session.close();
     }
+
+    public static void delete(Product product) {
+        Session session = NewHibernateUtil.getSessionFactory().openSession();
+        Transaction transaction = session.beginTransaction();
+        session.delete(product);
+        transaction.commit();
+        session.close();
+    }
 }
