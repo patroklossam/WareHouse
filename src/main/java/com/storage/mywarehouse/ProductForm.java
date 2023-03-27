@@ -71,11 +71,8 @@ public class ProductForm extends javax.swing.JFrame {
         setTitle("Customer Registration Form");
 
         jLabel30.setText("Brand");
-
         jLabel35.setText("Type");
-
         jLabel38.setText("Description");
-
         jButton1.setText("Save");
         jButton1.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
@@ -174,7 +171,6 @@ public class ProductForm extends javax.swing.JFrame {
 
         pack();
     }// </editor-fold>//GEN-END:initComponents
-
     private void jButton1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton1ActionPerformed
 
         String pBrand = "";
@@ -233,3 +229,4 @@ public class ProductForm extends javax.swing.JFrame {
     private javax.swing.JTextField type;
     // End of variables declaration//GEN-END:variables
 }
+// Adding my own comments

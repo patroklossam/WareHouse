@@ -94,19 +94,12 @@ public class clientForm extends javax.swing.JFrame {
         setTitle("Customer Registration Form");
 
         jLabel30.setText("First Name");
-
         jLabel35.setText("Last name");
-
         jLabelEmail.setText("Email");
-
         jLabelPostal.setText("Postal");
-
         jLabelCity.setText("City");
-
         jLabelTelephone.setText("Telephone");
-
         jLabel38.setText("Occupation");
-
         jLabel62.setText("Discount percentage");
 
         jButton1.setText("Save");

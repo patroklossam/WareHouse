@@ -7,7 +7,6 @@ import org.hibernate.Transaction;
 import org.hibernate.criterion.MatchMode;
 import org.hibernate.criterion.Order;
 import org.hibernate.criterion.Restrictions;
-
 import java.util.List;
 
 import static org.hibernate.criterion.Restrictions.and;
@@ -40,7 +39,6 @@ public class EntryDAO {
         session.close();
         return entry;
     }
-
     public static void delete(Entry entry) {
         Session session = NewHibernateUtil.getSessionFactory().openSession();
         Transaction tx = session.beginTransaction();
@@ -48,7 +46,6 @@ public class EntryDAO {
         tx.commit();
         session.close();
     }
-    
     
     @SuppressWarnings("unchecked")
     public static List<Entry> findAll() {
@@ -59,7 +56,6 @@ public class EntryDAO {
         session.close();
         return entries;
     }
-
     public static void deleteAll(List<Entry> entries) {
         Session session = NewHibernateUtil.getSessionFactory().openSession();
         Transaction tx = session.beginTransaction();
@@ -88,7 +84,6 @@ public class EntryDAO {
 
 
     }
-
     public static List<Entry> findProductInWarehouse(int warehouseId,int productId){
 
         Session session = NewHibernateUtil.getSessionFactory().openSession();

@@ -98,13 +98,11 @@ public final class mainframe extends javax.swing.JFrame implements Observer {
     }
 
     public mainframe() {
-
         panels = new ArrayList<>();
         warehouseList = new ArrayList<>();
         customer_dc = new ArrayDoubleList();
         customer_dc.add(0.0);
         initComponents();
-
         setTitle("StoreHouse");
 
         tableModel = new DefaultTableModel(new Object[]{"Code", "Brand", "Type", "Total Amount", "Warehouse", "Price", "Price after Discount"}, 0);
@@ -133,10 +131,8 @@ public final class mainframe extends javax.swing.JFrame implements Observer {
         jTable1.getColumnModel().getColumn(6).setMinWidth(150);
         jTable1.getColumnModel().getColumn(6).setPreferredWidth(150);
         jTable1.getColumnModel().getColumn(6).setMaxWidth(150);
-
         reporter.setAutoResizeMode(JTable.AUTO_RESIZE_OFF);
         reporter.setRowSelectionAllowed(true);
-
         reporter.getColumnModel().getColumn(0).setMinWidth(150);
         reporter.getColumnModel().getColumn(0).setPreferredWidth(150);
         reporter.getColumnModel().getColumn(0).setMaxWidth(150);
